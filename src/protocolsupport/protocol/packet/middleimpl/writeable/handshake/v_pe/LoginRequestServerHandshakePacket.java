@@ -1,5 +1,21 @@
 package protocolsupport.protocol.packet.middleimpl.writeable.handshake.v_pe;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonObject;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.ECDSASigner;
+import com.nimbusds.jose.jwk.Curve;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.EncoderException;
+import net.md_5.bungee.protocol.packet.LoginRequest;
+import protocolsupport.protocol.packet.middleimpl.writeable.PESingleWriteablePacket;
+import protocolsupport.protocol.serializer.ArraySerializer;
+import protocolsupport.utils.Utils;
+
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
@@ -10,23 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.reflect.TypeToken;
-import com.google.gson.JsonObject;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.crypto.ECDSASigner;
-import com.nimbusds.jose.jwk.Curve;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.EncoderException;
-import net.md_5.bungee.protocol.packet.LoginRequest;
-import protocolsupport.protocol.packet.middleimpl.writeable.PESingleWriteablePacket;
-import protocolsupport.protocol.serializer.ArraySerializer;
-import protocolsupport.utils.Utils;
 
 public class LoginRequestServerHandshakePacket extends PESingleWriteablePacket<LoginRequest> {
 
@@ -56,6 +55,7 @@ public class LoginRequestServerHandshakePacket extends PESingleWriteablePacket<L
 		jwtdata.writeIntLE(auxdata.length);
 		jwtdata.writeBytes(auxdata);
 		ArraySerializer.writeVarIntLengthByteArray(data, jwtdata);
+		data.writeBoolean(!(connection.getMetadata("_PE_TRANSFER_") == null));
 	}
 
 	@SuppressWarnings("serial")
