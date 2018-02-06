@@ -9,6 +9,7 @@ import net.md_5.bungee.protocol.Protocol;
 import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.packet.middle.ReadableMiddlePacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.BossEventPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerChatPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerPluginMessagePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.KickPacket;
@@ -23,6 +24,7 @@ public class FromServerPacketDecoder extends MinecraftDecoder {
 
 	protected final PacketIdMiddleTransformerRegistry<ReadableMiddlePacket> registry = new PacketIdMiddleTransformerRegistry<>();
 	{
+		registry.register(Protocol.GAME, BossEventPacket.PACKET_ID, BossEventPacket.class);
 		registry.register(Protocol.GAME, KickPacket.PACKET_ID, KickPacket.class);
 		registry.register(Protocol.GAME, LoginPacket.PACKET_ID, LoginPacket.class);
 		registry.register(Protocol.GAME, FromServerChatPacket.PACKET_ID, FromServerChatPacket.class);
