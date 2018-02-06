@@ -1,7 +1,5 @@
 package protocolsupport.protocol.pipeline.version.v_pe;
 
-import java.util.List;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
@@ -12,11 +10,14 @@ import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.packet.middle.ReadableMiddlePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerChatPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerPluginMessagePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.KickPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.LoginPacket;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;
+
+import java.util.List;
 
 public class FromServerPacketDecoder extends MinecraftDecoder {
 
@@ -25,6 +26,7 @@ public class FromServerPacketDecoder extends MinecraftDecoder {
 		registry.register(Protocol.GAME, KickPacket.PACKET_ID, KickPacket.class);
 		registry.register(Protocol.GAME, LoginPacket.PACKET_ID, LoginPacket.class);
 		registry.register(Protocol.GAME, FromServerChatPacket.PACKET_ID, FromServerChatPacket.class);
+		registry.register(Protocol.GAME, FromServerPluginMessagePacket.PACKET_ID, FromServerPluginMessagePacket.class);
 //		registry.register(Protocol.GAME, RespawnPacket.PACKET_ID, RespawnPacket.class); //TODO: implement after implementing in PSPE
 //		registry.register(Protocol.GAME, PlayerListItemPacket.PACKET_ID, PlayerListItemPacket.class); //TODO: implement at bungee level (without this entry it's a direct passthrough, so entries will duplicate upon server switch)
 	}
