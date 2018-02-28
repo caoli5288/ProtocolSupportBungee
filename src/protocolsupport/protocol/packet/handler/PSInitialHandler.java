@@ -1,20 +1,6 @@
 package protocolsupport.protocol.packet.handler;
 
-import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-
-import javax.crypto.SecretKey;
-
 import com.google.common.base.Preconditions;
-
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.EncryptionUtil;
 import net.md_5.bungee.UserConnection;
@@ -52,6 +38,19 @@ import protocolsupport.api.events.PlayerPropertiesResolveEvent;
 import protocolsupport.api.events.PlayerPropertiesResolveEvent.ProfileProperty;
 import protocolsupport.protocol.ConnectionImpl;
 import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.LoginHandshakePacket;
+import protocolsupport.protocol.storage.NetworkDataCache;
+
+import javax.crypto.SecretKey;
+import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class PSInitialHandler extends InitialHandler {
 
@@ -169,7 +168,8 @@ public class PSInitialHandler extends InitialHandler {
 						disconnect("This server is in online mode, but no valid XUID was found (XBOX live auth required)");
 						return;
 					} else {
-						uuid = new UUID(0, Long.parseLong(xuid));
+//						uuid = new UUID(0, Long.parseLong(xuid));
+						uuid = NetworkDataCache.getFrom(connection).getPEClientUUID();
 					}
 				}
 				finishLogin();

@@ -14,6 +14,7 @@
 plugins {
 	id 'java'
 	id 'de.undercouch.download' version '3.1.1'
+    id 'io.franzbecker.gradle-lombok' version '1.11'
 }
 
 apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
@@ -62,10 +63,16 @@ repositories {
 
 dependencies {
 	shadow files(new File(dllibs, 'BungeeCord.jar'))
-	compile files(new File(dllibs, 'RakNetServer.jar'))
+	compile files(new File(dllibs, 'RakNetServer.jar'), new File(dllibs, "authlib.jar"))
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 	compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.2'
+	compile "com.zaxxer:HikariCP:2.7.8"
 }
+
+ configurations {
+	 /* We don't want the storm-core dependency in our shadowJar */
+	 runtime.exclude module: 'lombok'
+ }
 
 shadowJar {
 	doFirst {

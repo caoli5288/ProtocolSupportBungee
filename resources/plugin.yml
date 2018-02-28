@@ -2,3 +2,10 @@ name: ProtocolSupportBungee
 main: protocolsupport.ProtocolSupport
 version: 1.4.dev
 author: _Shevchik_
+
+naming_convert_lobby: naming
+naming_convert: true
+database:
+  url: jdbc:mysql://localhost/db
+  user: root
+  password: wowsuchpassword

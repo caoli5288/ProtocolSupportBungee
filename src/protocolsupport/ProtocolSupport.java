@@ -1,6 +1,9 @@
 package protocolsupport;
 
+import com.zaxxer.hikari.HikariDataSource;
 import io.netty.buffer.ByteBuf;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -8,6 +11,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.PacketWrapper;
+import org.yaml.snakeyaml.Yaml;
 import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.injector.BungeeNettyChannelInjector;
@@ -15,13 +19,19 @@ import protocolsupport.injector.pe.PEProxyServer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.utils.netty.Allocator;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.util.Map;
 import java.util.Set;
 
 public class ProtocolSupport extends Plugin implements Listener {
 
+	@Getter
+	private static HikariDataSource dataSource;
 	private PEProxyServer peserver;
 
-	@Override
+	@SneakyThrows
 	public void onLoad() {
 		try {
 			getProxy().getPluginManager().registerCommand(this, new CommandHandler());
@@ -32,10 +42,32 @@ public class ProtocolSupport extends Plugin implements Listener {
 		}
 	}
 
-	@Override
+	@SneakyThrows
 	public void onEnable() {
 		(peserver = new PEProxyServer()).start();
 		getProxy().getPluginManager().registerListener(this, this);
+
+		File dataFolder = getDataFolder();
+		if (!dataFolder.isDirectory() && dataFolder.mkdir()) {
+			throw new IllegalStateException("mkdir");
+		}
+
+		File plugin = new File(dataFolder, "plugin.yml");
+		if (!plugin.isFile()) {
+			Files.copy(getResourceAsStream("plugin.yml"), plugin.toPath());
+		}
+
+		Map<String, Object> load = new Yaml().load(new FileInputStream(plugin));
+		Object convert = load.get("naming_convert");
+		if (!(convert == null) && ((boolean) convert) && load.containsKey("naming_convert_lobby")) {
+			Map<String, String> database = (Map<String, String>) load.get("database");
+			dataSource = new HikariDataSource();
+			dataSource.setJdbcUrl(database.get("url"));
+			dataSource.setUsername(database.get("user"));
+			dataSource.setPassword(database.get("password"));
+			dataSource.getConnection().close();// fast fail if not connected
+			getProxy().getPluginManager().registerListener(this, new NamingConvertListener(load.get("naming_convert_lobby").toString()));
+		}
 	}
 
 	@EventHandler

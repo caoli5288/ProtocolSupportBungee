@@ -1,5 +1,29 @@
 package protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonObject;
+import com.netease.mc.authlib.Profile;
+import com.netease.mc.authlib.TokenChain;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.DecoderException;
+import lombok.SneakyThrows;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.packet.Handshake;
+import net.md_5.bungee.protocol.packet.LoginRequest;
+import protocolsupport.api.ProtocolVersion;
+import protocolsupport.api.utils.Any;
+import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
+import protocolsupport.protocol.serializer.ArraySerializer;
+import protocolsupport.protocol.serializer.MiscSerializer;
+import protocolsupport.utils.JsonUtils;
+import protocolsupport.utils.Utils;
+
 import java.io.InputStreamReader;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -14,27 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.google.common.reflect.TypeToken;
-import com.google.gson.JsonObject;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.DecoderException;
-import net.md_5.bungee.protocol.PacketWrapper;
-import net.md_5.bungee.protocol.packet.Handshake;
-import net.md_5.bungee.protocol.packet.LoginRequest;
-import protocolsupport.api.ProtocolVersion;
-import protocolsupport.api.utils.Any;
-import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
-import protocolsupport.protocol.serializer.ArraySerializer;
-import protocolsupport.protocol.serializer.MiscSerializer;
-import protocolsupport.utils.JsonUtils;
-import protocolsupport.utils.Utils;
 
 public class LoginHandshakePacket extends PEDefinedReadableMiddlePacket {
 
@@ -58,40 +61,45 @@ public class LoginHandshakePacket extends PEDefinedReadableMiddlePacket {
 		);
 	}
 
-	@SuppressWarnings("serial")
-	@Override
+	@SneakyThrows
 	protected void read0(ByteBuf clientdata) {
 		clientdata.readInt();
 		ByteBuf logindata = Unpooled.wrappedBuffer(ArraySerializer.readVarIntLengthByteArray(clientdata));
-		try {
-			Any<Key, JsonObject> chaindata = extractChainData(Utils.GSON.fromJson(
+		Map<String, List<String>> maindata = Utils.GSON.fromJson(
 				new InputStreamReader(new ByteBufInputStream(logindata, logindata.readIntLE())),
-				new TypeToken<Map<String, List<String>>>() {}.getType()
-			));
+				new TypeToken<Map<String, List<String>>>() {
+				}.getType()
+		);
+		List<String> chain = maindata.get("chain");
+		if (ProxyServer.getInstance().getConfig().isOnlineMode()) {
+			Profile profile = TokenChain.check(chain.subList(1, chain.size()).toArray(new String[chain.size() - 1]));
+			username = profile.displayName;
+			cache.setPEClientUUID(profile.identity);
+			connection.addMetadata(XUID_METADATA_KEY, profile.XUID);
+		} else {
+			Any<Key, JsonObject> chaindata = extractChainData(chain);
 			username = JsonUtils.getString(chaindata.getObj2(), "displayName");
 			cache.setPEClientUUID(UUID.fromString(JsonUtils.getString(chaindata.getObj2(), "identity")));
 			if (chaindata.getObj1() != null) {
 				connection.addMetadata(XUID_METADATA_KEY, JsonUtils.getString(chaindata.getObj2(), "XUID"));
 			}
-			JWSObject additionaldata = JWSObject.parse(new String(MiscSerializer.readBytes(logindata, logindata.readIntLE())));
-			Map<String, String> clientinfo = Utils.GSON.fromJson(additionaldata.getPayload().toString(), new TypeToken<Map<String, String>>() {}.getType());
-			String rserveraddress = clientinfo.get("ServerAddress");
-			if (rserveraddress == null) {
-				throw new DecoderException("ServerAddress is missing");
-			}
-			String[] rserveraddresssplit = rserveraddress.split("[:]");
-			host = rserveraddresssplit[0];
-			port = Integer.parseInt(rserveraddresssplit[1]);
-			cache.setLocale(clientinfo.get("LanguageCode"));
-		} catch (ParseException e) {
-			throw new DecoderException("Unable to parse jwt", e);
 		}
+		JWSObject additionaldata = JWSObject.parse(new String(MiscSerializer.readBytes(logindata, logindata.readIntLE())));
+		Map<String, String> clientinfo = Utils.GSON.fromJson(additionaldata.getPayload().toString(), new TypeToken<Map<String, String>>() {
+		}.getType());
+		String rserveraddress = clientinfo.get("ServerAddress");
+		if (rserveraddress == null) {
+			throw new DecoderException("ServerAddress is missing");
+		}
+		String[] rserveraddresssplit = rserveraddress.split("[:]");
+		host = rserveraddresssplit[0];
+		port = Integer.parseInt(rserveraddresssplit[1]);
+		cache.setLocale(clientinfo.get("LanguageCode"));
 	}
 
 	private static final String MOJANG_KEY = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V";
 
-	private static Any<Key, JsonObject> extractChainData(Map<String, List<String>> maindata) throws ParseException {
-		List<String> chain = maindata.get("chain");
+	private static Any<Key, JsonObject> extractChainData(List<String> chain) throws ParseException {
 		try {
 			PublicKey key = parseKey(MOJANG_KEY);
 			boolean foundMojangKey = false;
