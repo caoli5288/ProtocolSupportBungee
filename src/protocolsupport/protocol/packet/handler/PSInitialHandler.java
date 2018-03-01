@@ -1,6 +1,21 @@
 package protocolsupport.protocol.packet.handler;
 
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoop;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpVersion;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.EncryptionUtil;
 import net.md_5.bungee.UserConnection;
@@ -17,7 +32,7 @@ import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.connection.UpstreamBridge;
-import net.md_5.bungee.http.HttpClient;
+import net.md_5.bungee.http.HttpInitializer;
 import net.md_5.bungee.jni.cipher.BungeeCipher;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
@@ -42,24 +57,36 @@ import protocolsupport.protocol.storage.NetworkDataCache;
 
 import javax.crypto.SecretKey;
 import java.math.BigInteger;
-import java.net.URLEncoder;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class PSInitialHandler extends InitialHandler {
 
+	protected ChannelWrapper channel;
+	protected Connection connection;
+	protected LoginState state = LoginState.HELLO;
+	protected UUID uuid;
+	protected String username;
+	protected EncryptionRequest request;
+	protected LoginResult loginProfile;
+	protected boolean onlineMode = BungeeCord.getInstance().config.isOnlineMode();
+	protected boolean useOnlineModeUUID = onlineMode;
+	protected UUID forcedUUID;
+	protected UUID offlineuuid;
+
 	public PSInitialHandler(BungeeCord bungee, ListenerInfo listener) {
 		super(bungee, listener);
 	}
-
-	protected ChannelWrapper channel;
-	protected Connection connection;
 
 	@Override
 	public void connected(ChannelWrapper channel) throws Exception {
@@ -71,36 +98,6 @@ public class PSInitialHandler extends InitialHandler {
 	public ChannelWrapper getChannelWrapper() {
 		return channel;
 	}
-
-	protected LoginState state = LoginState.HELLO;
-
-	protected UUID uuid;
-
-	@Override
-	public void setUniqueId(UUID uuid) {
-		Preconditions.checkState((state == LoginState.HELLO) || (state == LoginState.ONLINEMODERESOLVE), "Can only set uuid while state is username");
-		Preconditions.checkState(!isOnlineMode(), "Can only set uuid when online mode is false");
-		this.uuid = uuid;
-	}
-
-	@Override
-	public UUID getUniqueId() {
-		return uuid;
-	}
-
-	@Override
-	public String getUUID() {
-		return uuid.toString().replaceAll("-", "");
-	}
-
-	protected String username;
-
-	@Override
-	public String getName() {
-		return username;
-	}
-
-	protected EncryptionRequest request;
 
 	@Override
 	public void handle(LoginRequest loginRequest) throws Exception {
@@ -139,6 +136,34 @@ public class PSInitialHandler extends InitialHandler {
 		}));
 	}
 
+	@Override
+	public String getName() {
+		return username;
+	}
+
+	@Override
+	public UUID getUniqueId() {
+		return uuid;
+	}
+
+	@Override
+	public void setUniqueId(UUID uuid) {
+		Preconditions.checkState((state == LoginState.HELLO) || (state == LoginState.ONLINEMODERESOLVE), "Can only set uuid while state is username");
+		Preconditions.checkState(!isOnlineMode(), "Can only set uuid when online mode is false");
+		this.uuid = uuid;
+	}
+
+	@Override
+	public boolean isOnlineMode() {
+		return onlineMode;
+	}
+
+	@Override
+	public void setOnlineMode(boolean onlineMode) {
+		Preconditions.checkState((state == LoginState.HELLO) || (state == LoginState.ONLINEMODERESOLVE), "Can only set uuid while state is username");
+		this.onlineMode = onlineMode;
+	}
+
 	protected void processLoginStart() {
 		PlayerLoginStartEvent event = new PlayerLoginStartEvent(connection, username, isOnlineMode(), getHandshake().getHost());
 		ProxyServer.getInstance().getPluginManager().callEvent(event);
@@ -147,7 +172,7 @@ public class PSInitialHandler extends InitialHandler {
 			return;
 		}
 
-		isOnlineMode = event.isOnlineMode();
+		onlineMode = event.isOnlineMode();
 		useOnlineModeUUID = event.useOnlineModeUUID();
 		forcedUUID = event.getForcedUUID();
 
@@ -181,77 +206,6 @@ public class PSInitialHandler extends InitialHandler {
 		}
 	}
 
-	protected LoginResult loginProfile;
-
-	@Override
-	public LoginResult getLoginProfile() {
-		return loginProfile;
-	}
-
-	@Override
-	public void handle(EncryptionResponse encryptResponse) throws Exception {
-		Preconditions.checkState(state == LoginState.KEY, "Not expecting ENCRYPT");
-		state = LoginState.AUTHENTICATING;
-		SecretKey sharedKey = EncryptionUtil.getSecret(encryptResponse, request);
-		BungeeCipher decrypt = EncryptionUtil.getCipher(false, sharedKey);
-		channel.addBefore(PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder(decrypt));
-		if (isFullEncryption(connection.getVersion())) {
-			BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
-			channel.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
-		}
-		String encName = URLEncoder.encode(getName(), "UTF-8");
-		MessageDigest sha = MessageDigest.getInstance("SHA-1");
-		for (byte[] bit : new byte[][] { request.getServerId().getBytes("ISO_8859_1"), sharedKey.getEncoded(), EncryptionUtil.keys.getPublic().getEncoded() }) {
-			sha.update(bit);
-		}
-		String encodedHash = URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
-		String preventProxy = BungeeCord.getInstance().config.isPreventProxyConnections() ? ("&ip=" + URLEncoder.encode(getAddress().getAddress().getHostAddress(), "UTF-8")) : "";
-		String authURL = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + encName + "&serverId=" + encodedHash + preventProxy;
-		Callback<String> handler = new Callback<String>() {
-			@Override
-			public void done(String result, Throwable error) {
-				if (error == null) {
-					LoginResult obj = BungeeCord.getInstance().gson.fromJson(result, LoginResult.class);
-					if ((obj != null) && (obj.getId() != null)) {
-						loginProfile = obj;
-						username = obj.getName();
-						uuid = Util.getUUID(obj.getId());
-						finishLogin();
-						return;
-					}
-					disconnect(BungeeCord.getInstance().getTranslation("offline_mode_player"));
-				} else {
-					disconnect(BungeeCord.getInstance().getTranslation("mojang_fail"));
-					BungeeCord.getInstance().getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
-				}
-			}
-		};
-		HttpClient.get(authURL, channel.getHandle().eventLoop(), handler);
-	}
-
-	protected boolean isOnlineMode = BungeeCord.getInstance().config.isOnlineMode();
-
-	@Override
-	public void setOnlineMode(boolean onlineMode) {
-		Preconditions.checkState((state == LoginState.HELLO) || (state == LoginState.ONLINEMODERESOLVE), "Can only set uuid while state is username");
-		this.isOnlineMode = onlineMode;
-	}
-
-	@Override
-	public boolean isOnlineMode() {
-		return isOnlineMode;
-	}
-
-	protected boolean useOnlineModeUUID = isOnlineMode;
-	protected UUID forcedUUID;
-
-	protected UUID offlineuuid;
-
-	@Override
-	public UUID getOfflineId() {
-		return offlineuuid;
-	}
-
 	@SuppressWarnings("deprecation")
 	protected void finishLogin() {
 		offlineuuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getName()).getBytes(StandardCharsets.UTF_8));
@@ -264,7 +218,7 @@ public class PSInitialHandler extends InitialHandler {
 
 		PlayerPropertiesResolveEvent propResolveEvent = new PlayerPropertiesResolveEvent(
 			connection, username,
-			loginProfile != null ?
+			loginProfile != null && loginProfile.getProperties() != null ?
 			Arrays.stream(loginProfile.getProperties())
 			.map(bprop -> new ProfileProperty(bprop.getName(), bprop.getValue(), bprop.getSignature()))
 			.collect(Collectors.toList())
@@ -294,20 +248,22 @@ public class PSInitialHandler extends InitialHandler {
 				return;
 			}
 		}
-		Callback<LoginEvent> complete = new Callback<LoginEvent>() {
-			@Override
-			public void done(LoginEvent result, Throwable error) {
-				if (result.isCancelled()) {
-					disconnect(result.getCancelReasonComponents());
-					return;
-				}
-				if (!isConnected()) {
-					return;
-				}
-				channel.getHandle().eventLoop().execute(() -> processLoginFinish());
-			}
-		};
+		Callback<LoginEvent> complete = (result, error) -> {
+            if (result.isCancelled()) {
+                disconnect(result.getCancelReasonComponents());
+                return;
+            }
+            if (!isConnected()) {
+                return;
+            }
+            channel.getHandle().eventLoop().execute(() -> processLoginFinish());
+        };
 		BungeeCord.getInstance().getPluginManager().callEvent(new LoginEvent(this, complete));
+	}
+
+	@Override
+	public String getUUID() {
+		return uuid.toString().replaceAll("-", "");
 	}
 
 	@SuppressWarnings("deprecation")
@@ -342,12 +298,169 @@ public class PSInitialHandler extends InitialHandler {
 		}
 	}
 
-	public enum LoginState {
-		HELLO, ONLINEMODERESOLVE, KEY, AUTHENTICATING;
+	@Override
+	public LoginResult getLoginProfile() {
+		return loginProfile;
+	}
+
+	@Override
+	public void handle(EncryptionResponse encryptResponse) throws Exception {
+		Preconditions.checkState(state == LoginState.KEY, "Not expecting ENCRYPT");
+		state = LoginState.AUTHENTICATING;
+		SecretKey sharedKey = EncryptionUtil.getSecret(encryptResponse, request);
+		BungeeCipher decrypt = EncryptionUtil.getCipher(false, sharedKey);
+		channel.addBefore(PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder(decrypt));
+		if (isFullEncryption(connection.getVersion())) {
+			BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
+			channel.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
+		}
+		MessageDigest sha = MessageDigest.getInstance("SHA-1");
+		for (byte[] bit : new byte[][]{request.getServerId().getBytes("ISO_8859_1"), sharedKey.getEncoded(), EncryptionUtil.keys.getPublic().getEncoded()}) {
+			sha.update(bit);
+		}
+		String serverId = new BigInteger(sha.digest()).toString(16);
+		String authURL = "http://x19authserver.nie.netease.com/check";
+		ValidReq validReq = new ValidReq(getName(), serverId);
+		Callback<String> handler = (result, error) -> {
+			if (error == null) {
+				LoginResult obj = BungeeCord.getInstance().gson.fromJson(result, LoginResult.class);
+//				System.out.println("!!! Login result " + obj);
+//				System.out.println("!!! " + result);
+				if ((obj != null) && (obj.getId() != null)) {
+					loginProfile = obj;
+					if (obj.getName() == null) {
+					    obj.setName(getName());
+                    } else {
+					    username = obj.getName();
+                    }
+					uuid = Util.getUUID(obj.getId());
+					finishLogin();
+					return;
+				}
+				disconnect(BungeeCord.getInstance().getTranslation("offline_mode_player"));
+			} else {
+				disconnect(BungeeCord.getInstance().getTranslation("mojang_fail"));
+				BungeeCord.getInstance().getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
+			}
+		};
+		Http.post(authURL, validReq, channel.getHandle().eventLoop(), handler);
 	}
 
 	protected static boolean isFullEncryption(ProtocolVersion version) {
 		return (version.getProtocolType() == ProtocolType.PC) && version.isAfterOrEq(ProtocolVersion.MINECRAFT_1_7_5);
+	}
+
+	@Override
+	public UUID getOfflineId() {
+		return offlineuuid;
+	}
+
+	public enum LoginState {
+		HELLO, ONLINEMODERESOLVE, KEY, AUTHENTICATING;
+	}
+
+	@Data
+	@AllArgsConstructor
+	public static class ValidReq {
+		public String username;
+		public String serverId;
+	}
+
+	static class Http {
+
+		public static final int TIMEOUT = 5000;
+		private static final Cache<String, InetAddress> addressCache = CacheBuilder.newBuilder().expireAfterWrite( 1, TimeUnit.MINUTES ).build();
+
+		@SuppressWarnings("UnusedAssignment")
+		public static void get(String url, EventLoop eventLoop, final Callback<String> callback)
+		{
+			httpRequest(url, null, eventLoop, callback);
+		}
+
+		private static void httpRequest(String url, final Object data, EventLoop eventLoop, final Callback<String> callback)
+		{
+			Preconditions.checkNotNull( url, "url" );
+			Preconditions.checkNotNull( eventLoop, "eventLoop" );
+			Preconditions.checkNotNull( callback, "callBack" );
+
+			final URI uri = URI.create( url );
+
+			Preconditions.checkNotNull( uri.getScheme(), "scheme" );
+			Preconditions.checkNotNull( uri.getHost(), "host" );
+			boolean ssl = uri.getScheme().equals( "https" );
+			int port = uri.getPort();
+			if ( port == -1 )
+			{
+				switch ( uri.getScheme() )
+				{
+					case "http":
+						port = 80;
+						break;
+					case "https":
+						port = 443;
+						break;
+					default:
+						throw new IllegalArgumentException( "Unknown scheme " + uri.getScheme() );
+				}
+			}
+
+			InetAddress inetHost = addressCache.getIfPresent( uri.getHost() );
+			if ( inetHost == null )
+			{
+				try
+				{
+					inetHost = InetAddress.getByName( uri.getHost() );
+				} catch ( UnknownHostException ex )
+				{
+					callback.done( null, ex );
+					return;
+				}
+				addressCache.put( uri.getHost(), inetHost );
+			}
+
+			ChannelFutureListener future = new ChannelFutureListener()
+			{
+				@Override
+				public void operationComplete(ChannelFuture future) throws Exception
+				{
+					if ( future.isSuccess() )
+					{
+						String path = uri.getRawPath() + ( ( uri.getRawQuery() == null ) ? "" : "?" + uri.getRawQuery() );
+
+						HttpRequest request;
+						if (data == null) {
+							request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, path  );
+						} else {
+							DefaultFullHttpRequest fullRequest = new DefaultFullHttpRequest (HttpVersion.HTTP_1_1, HttpMethod.POST, path  );
+							fullRequest.headers().set( HttpHeaders.Names.CONTENT_TYPE, "application/json");
+							String content = BungeeCord.getInstance().gson.toJson(data);
+							byte[] raw = content.getBytes("UTF-8");
+							fullRequest.headers().set( HttpHeaders.Names.CONTENT_LENGTH, raw.length);
+							fullRequest.content().clear().writeBytes(raw);
+
+							request = fullRequest;
+						}
+						request.headers().set( HttpHeaders.Names.HOST, uri.getHost() );
+
+						future.channel().writeAndFlush( request );
+					} else
+					{
+						addressCache.invalidate( uri.getHost() );
+						callback.done( null, future.cause() );
+					}
+				}
+			};
+
+			new Bootstrap().channel( PipelineUtils.getChannel() ).group( eventLoop ).handler( new HttpInitializer( callback, ssl, uri.getHost(), port ) ).
+					option( ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT ).remoteAddress( inetHost, port ).connect().addListener( future );
+		}
+
+		@SuppressWarnings("UnusedAssignment")
+		public static void post(String url, final Object data, EventLoop eventLoop, final Callback<String> callback)
+		{
+			httpRequest(url, data, eventLoop, callback);
+		}
+
 	}
 
 }

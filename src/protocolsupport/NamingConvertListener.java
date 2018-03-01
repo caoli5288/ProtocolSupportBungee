@@ -35,8 +35,12 @@ public class NamingConvertListener implements Listener {
         ConnectionImpl l = RefHelper.getField(connection, "connection");
         try {
             String lookup = lookupLocal(connection.getUniqueId(), connection.getName(), l.getVersion() == ProtocolVersion.MINECRAFT_PE);
-            connection.getLoginProfile().setName(lookup);
-            RefHelper.setField(connection, "username", lookup);
+            if (lookup == null) {
+                handled.add(connection.getUniqueId());
+            } else {
+                connection.getLoginProfile().setName(lookup);
+                RefHelper.setField(connection, "username", lookup);
+            }
         } catch (Exception ignored) {
             handled.add(connection.getUniqueId());
             @Cleanup Connection conn = ProtocolSupport.getDataSource().getConnection();
@@ -56,7 +60,6 @@ public class NamingConvertListener implements Listener {
         @Cleanup ResultSet set = sql.executeQuery();
         if (set.next()) {
             String name = set.getString("name");
-            if (name == null) throw new IllegalStateException("null name");
             return name;
         }
         @Cleanup PreparedStatement sqll = conn.prepareStatement("insert into localprofile(id, name, name_origin, pc_pe) value(? ,?, ?, ?)");
