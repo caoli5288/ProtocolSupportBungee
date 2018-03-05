@@ -21,7 +21,10 @@ import protocolsupport.utils.netty.Allocator;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +47,6 @@ public class ProtocolSupport extends Plugin implements Listener {
 
 	@SneakyThrows
 	public void onEnable() {
-		(peserver = new PEProxyServer()).start();
 		getProxy().getPluginManager().registerListener(this, this);
 
 		File dataFolder = getDataFolder();
@@ -57,7 +59,7 @@ public class ProtocolSupport extends Plugin implements Listener {
 			Files.copy(getResourceAsStream("plugin.yml"), plugin.toPath());
 		}
 
-		Map<String, Object> load = new Yaml().load(new FileInputStream(plugin));
+		Map<String, ?> load = new Yaml().load(new FileInputStream(plugin));
 		Object convert = load.get("naming_convert");
 		if (!(convert == null) && ((boolean) convert) && load.containsKey("naming_convert_lobby")) {
 			Map<String, String> database = (Map<String, String>) load.get("database");
@@ -68,6 +70,15 @@ public class ProtocolSupport extends Plugin implements Listener {
 			dataSource.getConnection().close();// fast fail if not connected
 			getProxy().getPluginManager().registerListener(this, new NamingConvertListener(load.get("naming_convert_lobby").toString()));
 		}
+
+		String listen = (String) load.get("pocket_listen");
+
+		(peserver = new PEProxyServer(listen == null ? getProxy().getConfig().getListeners().iterator().next().getHost() : toInetAddr(listen))).start();
+	}
+
+	private InetSocketAddress toInetAddr(String listen) {
+		Iterator<String> itr = Arrays.asList(listen.split(":")).iterator();
+		return new InetSocketAddress(itr.next(), itr.hasNext() ? Integer.valueOf(itr.next()) : 19132);
 	}
 
 	@EventHandler

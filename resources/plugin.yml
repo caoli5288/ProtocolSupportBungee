@@ -9,3 +9,5 @@ database:
   url: jdbc:mysql://localhost/db
   user: root
   password: wowsuchpassword
+
+pocket_listen: '0.0.0.0:19132'

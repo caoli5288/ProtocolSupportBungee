@@ -1,29 +1,29 @@
 package protocolsupport.injector.pe;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import net.md_5.bungee.BungeeCord;
+import lombok.RequiredArgsConstructor;
 import raknetserver.RakNetServer;
-import raknetserver.RakNetServer.UserChannelInitializer;
 
+import java.net.InetSocketAddress;
+
+@RequiredArgsConstructor
 public class PEProxyServer {
 
-	private final RakNetServer peserver = new RakNetServer(
-		BungeeCord.getInstance().getConfig().getListeners().iterator().next().getHost(),
-		PENetServerConstants.PING_HANDLER,
-		new UserChannelInitializer() {
-			@Override
-			public void init(Channel channel) {
-				ChannelPipeline pipeline = channel.pipeline();
-				pipeline.addLast(new PECompressor());
-				pipeline.addLast(new PEDecompressor());
-				pipeline.addLast(new PEProxyNetworkManager());
-			}
-		}, PENetServerConstants.USER_PACKET_ID
-	);
+	private final InetSocketAddress listener;
+
+	private RakNetServer peserver;
 
 	public void start() {
-		peserver.start();
+		(peserver = new RakNetServer(
+				listener,
+				PENetServerConstants.PING_HANDLER,
+				channel -> {
+					ChannelPipeline pipeline = channel.pipeline();
+					pipeline.addLast(new PECompressor());
+					pipeline.addLast(new PEDecompressor());
+					pipeline.addLast(new PEProxyNetworkManager());
+				}, PENetServerConstants.USER_PACKET_ID
+		)).start();
 	}
 
 	public void stop() {
