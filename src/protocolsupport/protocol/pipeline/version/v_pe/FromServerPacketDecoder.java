@@ -14,6 +14,8 @@ import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerC
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerPluginMessagePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.KickPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.LoginPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.SpawnEntity;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.SpawnPlayer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;
@@ -25,6 +27,8 @@ public class FromServerPacketDecoder extends MinecraftDecoder {
 	protected final PacketIdMiddleTransformerRegistry<ReadableMiddlePacket> registry = new PacketIdMiddleTransformerRegistry<>();
 	{
 		registry.register(Protocol.GAME, BossEventPacket.PACKET_ID, BossEventPacket.class);
+		registry.register(Protocol.GAME, SpawnEntity.PACKET_ID, SpawnEntity.class);
+		registry.register(Protocol.GAME, SpawnPlayer.PACKET_ID, SpawnPlayer.class);
 		registry.register(Protocol.GAME, KickPacket.PACKET_ID, KickPacket.class);
 		registry.register(Protocol.GAME, LoginPacket.PACKET_ID, LoginPacket.class);
 		registry.register(Protocol.GAME, FromServerChatPacket.PACKET_ID, FromServerChatPacket.class);
