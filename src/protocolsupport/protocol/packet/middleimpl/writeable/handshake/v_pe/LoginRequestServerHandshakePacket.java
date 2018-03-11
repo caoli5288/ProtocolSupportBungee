@@ -11,9 +11,12 @@ import com.nimbusds.jose.jwk.Curve;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.EncoderException;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.protocol.packet.LoginRequest;
+import protocolsupport.Environment;
 import protocolsupport.protocol.packet.middleimpl.writeable.PESingleWriteablePacket;
 import protocolsupport.protocol.serializer.ArraySerializer;
+import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.utils.Utils;
 
 import java.net.URI;
@@ -45,8 +48,8 @@ public class LoginRequestServerHandshakePacket extends PESingleWriteablePacket<L
 	}
 
 	@Override
-	protected void write(ByteBuf data, LoginRequest packet) {
-		data.writeInt(connection.getVersion().getId());
+	protected void write(ByteBuf buf, LoginRequest packet) {
+		buf.writeInt(connection.getVersion().getId());
 		ByteBuf jwtdata = Unpooled.buffer();
 		byte[] identitydata = createIdentityData(packet.getData()).getBytes(StandardCharsets.UTF_8);
 		jwtdata.writeIntLE(identitydata.length);
@@ -54,8 +57,9 @@ public class LoginRequestServerHandshakePacket extends PESingleWriteablePacket<L
 		byte[] auxdata = createAuxData().getBytes(StandardCharsets.UTF_8);
 		jwtdata.writeIntLE(auxdata.length);
 		jwtdata.writeBytes(auxdata);
-		ArraySerializer.writeVarIntLengthByteArray(data, jwtdata);
-		data.writeBoolean(!(connection.getMetadata("_PE_TRANSFER_") == null));
+		ArraySerializer.writeVarIntLengthByteArray(buf, jwtdata);
+		buf.writeBoolean(!(connection.getMetadata("_PE_TRANSFER_") == null));
+		VarNumberSerializer.writeVarInt(buf, Environment.getByDimension(((UserConnection) connection.getPlayer()).getDimension()).getPEDimension());
 	}
 
 	@SuppressWarnings("serial")

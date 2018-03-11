@@ -2,9 +2,6 @@ package protocolsupport.protocol.serializer;
 
 import io.netty.buffer.ByteBuf;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 public final class VarInt {
 
     private VarInt() {
@@ -44,13 +41,13 @@ public final class VarInt {
         return (v >>> 1) ^ -(v & 1);
     }
 
-    private static long read(ByteBuf buf, int maxSize) {
+    private static long read(ByteBuf buf, int length) {
         long value = 0;
         int size = 0;
         int b;
         while (((b = buf.readByte()) & 0x80) == 0x80) {
             value |= (long) (b & 0x7F) << (size++ * 7);
-            if (size >= maxSize) {
+            if (size >= length) {
                 throw new IllegalArgumentException("VarLong too big");
             }
         }
@@ -62,7 +59,7 @@ public final class VarInt {
      * @param buf InputStream
      * @return Signed int
      */
-    public static int readVarInt(ByteBuf buf) throws IOException {
+    public static int readVarInt(ByteBuf buf) {
         return decodeZigZag32(readUnsignedVarInt(buf));
     }
 
@@ -70,7 +67,7 @@ public final class VarInt {
      * @param buf InputStream
      * @return Unsigned int
      */
-    public static long readUnsignedVarInt(ByteBuf buf) throws IOException {
+    public static long readUnsignedVarInt(ByteBuf buf) {
         return read(buf, 5);
     }
 
@@ -82,48 +79,48 @@ public final class VarInt {
         return read(buf, 10);
     }
 
-    private static void write(OutputStream stream, long value) throws IOException {
+    private static void write(ByteBuf buf, long value) {
         do {
-            byte temp = (byte) (value & 0b01111111);
+            byte b = (byte) (value & 0b01111111);
             // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
             value >>>= 7;
             if (value != 0) {
-                temp |= 0b10000000;
+                b |= 0b10000000;
             }
-            stream.write(temp);
+            buf.writeByte(b);
         } while (value != 0);
     }
 
     /**
-     * @param stream OutputStream
-     * @param value  Signed int
+     * @param buf   OutputStream
+     * @param value Signed int
      */
-    public static void writeVarInt(OutputStream stream, int value) throws IOException {
-        writeUnsignedVarInt(stream, encodeZigZag32(value));
+    public static void writeVarInt(ByteBuf buf, int value) {
+        writeUnsignedVarInt(buf, encodeZigZag32(value));
     }
 
     /**
-     * @param stream OutputStream
-     * @param value  Unsigned int
+     * @param buf   OutputStream
+     * @param value Unsigned int
      */
-    public static void writeUnsignedVarInt(OutputStream stream, long value) throws IOException {
-        write(stream, value);
+    public static void writeUnsignedVarInt(ByteBuf buf, long value) {
+        write(buf, value);
     }
 
 
     /**
-     * @param stream OutputStream
-     * @param value  Signed long
+     * @param buf   OutputStream
+     * @param value Signed long
      */
-    public static void writeVarLong(OutputStream stream, long value) throws IOException {
-        writeUnsignedVarLong(stream, encodeZigZag64(value));
+    public static void writeVarLong(ByteBuf buf, long value) {
+        writeUnsignedVarLong(buf, encodeZigZag64(value));
     }
 
     /**
-     * @param stream OutputStream
-     * @param value  Unsigned long
+     * @param buf   OutputStream
+     * @param value Unsigned long
      */
-    public static void writeUnsignedVarLong(OutputStream stream, long value) throws IOException {
-        write(stream, value);
+    public static void writeUnsignedVarLong(ByteBuf buf, long value) {
+        write(buf, value);
     }
 }

@@ -1,11 +1,10 @@
 package protocolsupport.protocol.storage;
 
-import java.util.UUID;
-
-import org.apache.commons.lang3.Validate;
-
 import net.md_5.bungee.protocol.packet.Handshake;
+import org.apache.commons.lang3.Validate;
 import protocolsupport.api.Connection;
+
+import java.util.UUID;
 
 public class NetworkDataCache {
 

@@ -9,13 +9,13 @@ import net.md_5.bungee.protocol.Protocol;
 import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.packet.middle.ReadableMiddlePacket;
-import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.BossEventPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServBossEventPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerChatPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerPluginMessagePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.KickPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.LoginPacket;
-import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.SpawnEntity;
-import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.SpawnPlayer;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.PlayerListItemPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.RespawnPacket;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;
@@ -26,15 +26,13 @@ public class FromServerPacketDecoder extends MinecraftDecoder {
 
 	protected final PacketIdMiddleTransformerRegistry<ReadableMiddlePacket> registry = new PacketIdMiddleTransformerRegistry<>();
 	{
-		registry.register(Protocol.GAME, BossEventPacket.PACKET_ID, BossEventPacket.class);
-		registry.register(Protocol.GAME, SpawnEntity.PACKET_ID, SpawnEntity.class);
-		registry.register(Protocol.GAME, SpawnPlayer.PACKET_ID, SpawnPlayer.class);
+		registry.register(Protocol.GAME, FromServBossEventPacket.PACKET_ID, FromServBossEventPacket.class);
 		registry.register(Protocol.GAME, KickPacket.PACKET_ID, KickPacket.class);
 		registry.register(Protocol.GAME, LoginPacket.PACKET_ID, LoginPacket.class);
 		registry.register(Protocol.GAME, FromServerChatPacket.PACKET_ID, FromServerChatPacket.class);
+		registry.register(Protocol.GAME, RespawnPacket.PACKET_ID, RespawnPacket.class);
+		registry.register(Protocol.GAME, PlayerListItemPacket.PACKET_ID, PlayerListItemPacket.class);
 		registry.register(Protocol.GAME, FromServerPluginMessagePacket.PACKET_ID, FromServerPluginMessagePacket.class);
-//		registry.register(Protocol.GAME, RespawnPacket.PACKET_ID, RespawnPacket.class); //TODO: implement after implementing in PSPE
-//		registry.register(Protocol.GAME, PlayerListItemPacket.PACKET_ID, PlayerListItemPacket.class); //TODO: implement at bungee level (without this entry it's a direct passthrough, so entries will duplicate upon server switch)
 	}
 
 	protected final Connection connection;

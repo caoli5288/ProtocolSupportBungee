@@ -1,9 +1,5 @@
 package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collection;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.PacketWrapper;
@@ -13,6 +9,10 @@ import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMidd
 import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class LoginPacket extends PEDefinedReadableMiddlePacket {
 

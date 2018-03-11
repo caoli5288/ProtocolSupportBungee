@@ -1,8 +1,5 @@
 package protocolsupport.protocol.packet.middleimpl.readable.play.v_4_5_6;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.PacketWrapper;
@@ -10,6 +7,9 @@ import net.md_5.bungee.protocol.packet.Login;
 import net.md_5.bungee.protocol.packet.LoginSuccess;
 import protocolsupport.protocol.packet.middleimpl.readable.LegacyDefinedReadableMiddlePacket;
 import protocolsupport.protocol.serializer.StringSerializer;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class LoginPacket extends LegacyDefinedReadableMiddlePacket {
 

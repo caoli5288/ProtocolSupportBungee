@@ -1,24 +1,18 @@
 package protocolsupport;
 
 import com.zaxxer.hikari.HikariDataSource;
-import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.protocol.PacketWrapper;
 import org.yaml.snakeyaml.Yaml;
 import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.injector.BungeeNettyChannelInjector;
 import protocolsupport.injector.pe.PEProxyServer;
-import protocolsupport.protocol.serializer.VarNumberSerializer;
-import protocolsupport.utils.netty.Allocator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +21,6 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 public class ProtocolSupport extends Plugin implements Listener {
 
@@ -88,42 +81,6 @@ public class ProtocolSupport extends Plugin implements Listener {
 		if (conn.getMetadata("_PE_TRANSFER_") == null) {
 			conn.addMetadata("_PE_TRANSFER_", "");
 		}
-	}
-
-	@EventHandler
-	public void handle(ServerConnectedEvent event) {
-		Connection conn = ProtocolSupportAPI.getConnection(event.getPlayer());
-		if (conn.getMetadata("_PE_TRANSFER_") == null) {
-			return;
-		}
-
-		Set<Long> entity = (Set<Long>) conn.getMetadata("_HANDLED_ENTITY_");
-		if (!(entity == null) && !entity.isEmpty()) {
-			conn.removeMetadata("_HANDLED_ENTITY_");
-			entity.forEach(unique -> {
-				ByteBuf buf = Allocator.allocateBuffer();
-				VarNumberSerializer.writeVarInt(buf, 14);
-				buf.writeByte(0);
-				buf.writeByte(0);
-				VarNumberSerializer.writeSVarLong(buf, unique);
-				((UserConnection) event.getPlayer()).sendPacket(new PacketWrapper(null, buf));
-			});
-		}
-
-		Set<Long> bar = (Set<Long>) conn.getMetadata("_HANDLED_BAR_");
-		if (!(bar == null) && !bar.isEmpty()) {
-			conn.removeMetadata("_HANDLED_BAR_");
-			bar.forEach(unique -> {
-				ByteBuf buf = Allocator.allocateBuffer();
-				VarNumberSerializer.writeVarInt(buf, 74);
-				buf.writeByte(0);
-				buf.writeByte(0);
-				VarNumberSerializer.writeSVarLong(buf, unique);
-				VarNumberSerializer.writeVarInt(buf, 2);
-				((UserConnection) event.getPlayer()).sendPacket(new PacketWrapper(null, buf));
-			});
-		}
-
 	}
 
 	@Override
