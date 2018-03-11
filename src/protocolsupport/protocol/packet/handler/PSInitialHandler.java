@@ -324,8 +324,6 @@ public class PSInitialHandler extends InitialHandler {
 		Callback<String> handler = (result, error) -> {
 			if (error == null) {
 				LoginResult obj = BungeeCord.getInstance().gson.fromJson(result, LoginResult.class);
-//				System.out.println("!!! Login result " + obj);
-//				System.out.println("!!! " + result);
 				if ((obj != null) && (obj.getId() != null)) {
 					loginProfile = obj;
 					if (obj.getName() == null) {

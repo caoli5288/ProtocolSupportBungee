@@ -3,7 +3,8 @@ package protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import protocolsupport.protocol.packet.middle.WriteableMiddlePacket;
-import protocolsupport.protocol.serializer.VarInt;
+import protocolsupport.protocol.serializer.MiscSerializer;
+import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.utils.netty.Allocator;
 
 import java.util.Arrays;
@@ -14,25 +15,30 @@ public class PlayerListItemPacket extends WriteableMiddlePacket<PlayerListItem> 
 
     @Override
     public Collection<ByteBuf> toData(PlayerListItem origin) {
+        ByteBuf buf = cache.getLastTabList().remove(origin);
+        if (!(buf == null)) {
+            return Collections.singletonList(buf);
+        }
         switch (origin.getAction()) {
+            case ADD_PLAYER:
+            case UPDATE_GAMEMODE:
+            case UPDATE_LATENCY:
+            case UPDATE_DISPLAY_NAME:
+                return Collections.emptyList();
             case REMOVE_PLAYER:
                 return createRemove(origin.getItems());
-            default:
-                return Collections.emptyList();
         }
+        throw new IllegalStateException("action type");
     }
 
     public static Collection<ByteBuf> createRemove(PlayerListItem.Item[] input) {
         ByteBuf pk = Allocator.allocateBuffer();
-        VarInt.writeUnsignedVarInt(pk, 63);
+        VarNumberSerializer.writeVarInt(pk, 63);
         pk.writeByte(0);
         pk.writeByte(0);
         pk.writeByte(1);// action remove
-        VarInt.writeUnsignedVarInt(pk, input.length);
-        Arrays.asList(input).forEach(ele -> {
-            VarInt.writeUnsignedVarLong(pk, ele.getUuid().getMostSignificantBits());
-            VarInt.writeUnsignedVarLong(pk, ele.getUuid().getLeastSignificantBits());
-        });
+        VarNumberSerializer.writeVarInt(pk, input.length);
+        Arrays.asList(input).forEach(ele -> MiscSerializer.writeUUIDLE(pk, ele.getUuid()));
         return Collections.singletonList(pk);
     }
 

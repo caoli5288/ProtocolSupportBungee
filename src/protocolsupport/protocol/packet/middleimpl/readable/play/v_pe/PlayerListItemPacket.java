@@ -2,13 +2,11 @@ package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
 import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
-import protocolsupport.protocol.serializer.VarInt;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 
 import java.util.ArrayList;
@@ -31,16 +29,9 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
     @Override
     protected void read0(ByteBuf pk) {
         byte actionid = pk.readByte();
-        switch (actionid) {
-            case 0:
-                action = Action.ADD_PLAYER;
-                break;
-            case 1:
-                action = Action.REMOVE_PLAYER;
-                break;
-        }
+        action = Action.values()[actionid];
 
-        int len = Math.toIntExact(VarInt.readUnsignedVarInt(pk));
+        int len = Math.toIntExact(VarNumberSerializer.readVarInt(pk));
         elementlist = new ArrayList<>();
         for (int i = len; i >= 1; i--) {
             elementlist.add(action.read(pk));
@@ -51,10 +42,13 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
 
     @Override
     public Collection<PacketWrapper> toNative() {
-        return Collections.singletonList(new PacketWrapper(tonative(), Unpooled.wrappedBuffer(readbytes)));
+        PlayerListItem pk = tonative();
+        ByteBuf buf = Unpooled.wrappedBuffer(readbytes);
+        cache.getLastTabList().put(pk, buf);
+        return Collections.singletonList(new PacketWrapper(pk, Unpooled.EMPTY_BUFFER));
     }
 
-    private DefinedPacket tonative() {
+    private PlayerListItem tonative() {
         PlayerListItem item = new PlayerListItem();
         item.setAction(action.origin);
         item.setItems(elementlist.stream().map(el -> {
@@ -62,15 +56,15 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
             i.setUuid(el);
             return i;
         }).toArray(PlayerListItem.Item[]::new));
-        return null;
+        return item;
     }
 
     enum Action {
         ADD_PLAYER(PlayerListItem.Action.ADD_PLAYER) {
             UUID read(ByteBuf buf) {
                 UUID id = MiscSerializer.readUUIDLE(buf);
-                VarNumberSerializer.readVarInt(buf);
-                StringSerializer.readVarIntUTF8String(buf);
+                VarNumberSerializer.readVarInt(buf);// Entity id
+                String name = StringSerializer.readVarIntUTF8String(buf);
                 StringSerializer.readVarIntUTF8String(buf);
                 StringSerializer.readVarIntUTF8String(buf);
                 StringSerializer.readVarIntUTF8String(buf);
@@ -82,7 +76,7 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
         },
         REMOVE_PLAYER(PlayerListItem.Action.REMOVE_PLAYER) {
             UUID read(ByteBuf buf) {
-                return new UUID(VarInt.readUnsignedVarLong(buf), VarInt.readUnsignedVarLong(buf));
+                return MiscSerializer.readUUIDLE(buf);
             }
         };
 

@@ -1,9 +1,13 @@
 package protocolsupport.protocol.storage;
 
+import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.Handshake;
+import net.md_5.bungee.protocol.packet.PlayerListItem;
 import org.apache.commons.lang3.Validate;
 import protocolsupport.api.Connection;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class NetworkDataCache {
@@ -50,4 +54,9 @@ public class NetworkDataCache {
 		return peClientUUID;
 	}
 
+	private final Map<PlayerListItem, ByteBuf> lastTabList = new HashMap<>();
+
+	public Map<PlayerListItem, ByteBuf> getLastTabList() {
+		return lastTabList;
+	}
 }
