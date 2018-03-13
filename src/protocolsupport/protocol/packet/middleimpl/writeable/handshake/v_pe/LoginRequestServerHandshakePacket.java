@@ -14,6 +14,7 @@ import io.netty.handler.codec.EncoderException;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import protocolsupport.Environment;
+import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.LoginHandshakePacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.PESingleWriteablePacket;
 import protocolsupport.protocol.serializer.ArraySerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
@@ -79,6 +80,12 @@ public class LoginRequestServerHandshakePacket extends PESingleWriteablePacket<L
 		JsonObject clientinfo = new JsonObject();
 		clientinfo.addProperty("ServerAddress", cache.getServerHandshake().getHost() + ":" + cache.getServerHandshake().getPort());
 		clientinfo.addProperty("LanguageCode", cache.getLocale());
+		Map<String, String> metadata = (Map<String, String>) connection.getMetadata(LoginHandshakePacket.HANDSHAKE_EXTRA_INFO_KEY);
+		if (!(metadata == null)) {
+			metadata.forEach((k, v) -> {
+				if (!clientinfo.has(k)) clientinfo.addProperty(k, v);
+			});
+		}
 		return encodeJWT(clientinfo);
 	}
 

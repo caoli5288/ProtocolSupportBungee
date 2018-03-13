@@ -8,7 +8,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import lombok.SneakyThrows;
@@ -24,6 +23,7 @@ import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.utils.JsonUtils;
 import protocolsupport.utils.Utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -42,6 +42,7 @@ import java.util.UUID;
 public class LoginHandshakePacket extends PEDefinedReadableMiddlePacket {
 
 	public static final String XUID_METADATA_KEY = "___PS_PE_XUID";
+	public static final String HANDSHAKE_EXTRA_INFO_KEY = "___PS_HANDSHAKE_EXTRA";
 
 	public static final int PACKET_ID = 1;
 
@@ -65,8 +66,11 @@ public class LoginHandshakePacket extends PEDefinedReadableMiddlePacket {
 	protected void read0(ByteBuf clientdata) {
 		clientdata.readInt();
 		ByteBuf logindata = Unpooled.wrappedBuffer(ArraySerializer.readVarIntLengthByteArray(clientdata));
+		byte[] buf = new byte[logindata.readIntLE()];
+		clientdata.readBytes(buf);
+		clientdata.skipBytes(clientdata.readableBytes());
 		Map<String, List<String>> maindata = Utils.GSON.fromJson(
-				new InputStreamReader(new ByteBufInputStream(logindata, logindata.readIntLE())),
+				new InputStreamReader(new ByteArrayInputStream(buf)),
 				new TypeToken<Map<String, List<String>>>() {
 				}.getType()
 		);
@@ -95,6 +99,7 @@ public class LoginHandshakePacket extends PEDefinedReadableMiddlePacket {
 		host = rserveraddresssplit[0];
 		port = Integer.parseInt(rserveraddresssplit[1]);
 		cache.setLocale(clientinfo.get("LanguageCode"));
+		connection.addMetadata(HANDSHAKE_EXTRA_INFO_KEY, clientinfo);
 	}
 
 	private static final String MOJANG_KEY = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V";
