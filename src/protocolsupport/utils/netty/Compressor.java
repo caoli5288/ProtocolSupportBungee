@@ -1,15 +1,12 @@
 package protocolsupport.utils.netty;
 
+import io.netty.util.Recycler;
+import io.netty.util.Recycler.Handle;
+
 import java.util.Arrays;
 import java.util.zip.Deflater;
 
-import io.netty.util.Recycler;
-import io.netty.util.Recycler.Handle;
-import protocolsupport.utils.Utils;
-
 public class Compressor {
-
-	private static final int compressionLevel = Utils.getJavaPropertyValue("compressionlevel", 3, Integer::parseInt);
 
 	private static final Recycler<Compressor> recycler = new Recycler<Compressor>() {
 		@Override
@@ -22,8 +19,9 @@ public class Compressor {
 		return recycler.get();
 	}
 
-	private final Deflater deflater = new Deflater(compressionLevel);
+	private final Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION);
 	private final Handle<Compressor> handle;
+
 	protected Compressor(Handle<Compressor> handle) {
 		this.handle = handle;
 	}
@@ -40,14 +38,4 @@ public class Compressor {
 	public void recycle() {
 		handle.recycle(this);
 	}
-
-	public static byte[] compressStatic(byte[] input) {
-		Compressor compressor = create();
-		try {
-			return compressor.compress(input);
-		} finally {
-			compressor.recycle();
-		}
-	}
-
 }

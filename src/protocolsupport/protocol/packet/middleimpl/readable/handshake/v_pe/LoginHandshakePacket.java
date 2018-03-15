@@ -8,6 +8,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import lombok.SneakyThrows;
@@ -23,7 +24,6 @@ import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.utils.JsonUtils;
 import protocolsupport.utils.Utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -66,11 +66,8 @@ public class LoginHandshakePacket extends PEDefinedReadableMiddlePacket {
 	protected void read0(ByteBuf clientdata) {
 		clientdata.readInt();
 		ByteBuf logindata = Unpooled.wrappedBuffer(ArraySerializer.readVarIntLengthByteArray(clientdata));
-		byte[] buf = new byte[logindata.readIntLE()];
-		clientdata.readBytes(buf);
-		clientdata.skipBytes(clientdata.readableBytes());
 		Map<String, List<String>> maindata = Utils.GSON.fromJson(
-				new InputStreamReader(new ByteArrayInputStream(buf)),
+				new InputStreamReader(new ByteBufInputStream(logindata, logindata.readIntLE())),
 				new TypeToken<Map<String, List<String>>>() {
 				}.getType()
 		);

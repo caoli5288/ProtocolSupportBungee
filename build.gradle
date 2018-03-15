@@ -35,8 +35,7 @@ dllibs.mkdirs()
 
 task updateLibs(type: Download) {
 	src([
-		'https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar',
-		'https://build.true-games.org/job/RakNetServer/lastSuccessfulBuild/artifact/target/RakNetServer.jar'
+		'https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar'
 	])
 	dest dllibs
 	onlyIfNewer true

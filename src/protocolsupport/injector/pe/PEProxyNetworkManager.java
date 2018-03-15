@@ -1,7 +1,5 @@
 package protocolsupport.injector.pe;
 
-import java.net.InetSocketAddress;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -11,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.protocol.Varint21LengthFieldPrepender;
 import protocolsupport.protocol.pipeline.common.EncapsulatedConnectionKeepAlive;
@@ -20,9 +19,11 @@ import protocolsupport.protocol.pipeline.common.PacketDecompressor;
 import protocolsupport.protocol.pipeline.common.VarIntFrameDecoder;
 import protocolsupport.utils.netty.ChannelInitializer;
 
+import java.net.InetSocketAddress;
+
 public class PEProxyNetworkManager extends SimpleChannelInboundHandler<ByteBuf> {
 
-	private static final NioEventLoopGroup group = new NioEventLoopGroup();
+	private static final NioEventLoopGroup group = new NioEventLoopGroup(0, new DefaultThreadFactory("peproxy"));
 
 	private Channel serverconnection;
 

@@ -2,6 +2,7 @@ package protocolsupport.injector.pe;
 
 import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
+import net.md_5.bungee.BungeeCord;
 import protocolsupport.api.ProtocolVersion;
 import raknetserver.pipeline.raknet.RakNetPacketConnectionEstablishHandler.PingHandler;
 
@@ -14,12 +15,13 @@ public class PENetServerConstants {
 	public static final PingHandler PING_HANDLER = new PingHandler() {
 		@Override
 		public String getServerInfo(Channel channel) {
-			//TODO: fake pspe packets for ping passthrough
+			BungeeCord server = BungeeCord.getInstance();
+			int online = server.getOnlineCount();
 			return String.join(";",
-				"MCPE",
-				REFERENCE.get(),
-				String.valueOf(ProtocolVersion.MINECRAFT_PE.getId()), POCKET_VERSION,
-				"0", "1"
+					"MCPE",
+					REFERENCE.get(),
+					String.valueOf(ProtocolVersion.MINECRAFT_PE.getId()), POCKET_VERSION,
+					online + "", server.config.getPlayerLimit() + ""
 			);
 		}
 		@Override
