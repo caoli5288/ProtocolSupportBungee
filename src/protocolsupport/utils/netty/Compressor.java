@@ -19,7 +19,7 @@ public class Compressor {
 		return recycler.get();
 	}
 
-	private final Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION);
+	private final Deflater deflater = new Deflater(3);
 	private final Handle<Compressor> handle;
 
 	protected Compressor(Handle<Compressor> handle) {

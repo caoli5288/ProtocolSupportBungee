@@ -59,7 +59,7 @@ public class PEProxyNetworkManager extends SimpleChannelInboundHandler<ByteBuf> 
 				.addLast("keepalive", new EncapsulatedConnectionKeepAlive())
 				.addLast("prepender", new Varint21LengthFieldPrepender())
 				.addLast("splitter", new VarIntFrameDecoder())
-				.addLast("compress", new PacketCompressor(256))
+				.addLast("compress", new PacketCompressor(BungeeCord.getInstance().config.getCompressionThreshold()))
 				.addLast("decompress", new PacketDecompressor())
 				.addLast("handler", new SimpleChannelInboundHandler<ByteBuf>() {
 					@Override
