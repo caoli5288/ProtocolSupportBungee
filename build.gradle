@@ -62,7 +62,7 @@ repositories {
 
 dependencies {
 	shadow files(new File(dllibs, 'BungeeCord.jar'))
-	compile files(new File(dllibs, 'RakNetServer.jar'), new File(dllibs, "authlib.jar"))
+	compile files(new File(dllibs, 'RakNetServer.jar'), new File(dllibs, "authlib.jar"), new File(dllibs, "UdpServerSocketChannel.jar"))
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 	compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.2'
 	compile "com.zaxxer:HikariCP:2.7.8"
