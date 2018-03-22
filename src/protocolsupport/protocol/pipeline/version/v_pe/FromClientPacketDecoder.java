@@ -1,7 +1,5 @@
 package protocolsupport.protocol.pipeline.version.v_pe;
 
-import java.util.List;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
@@ -10,19 +8,24 @@ import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.Protocol;
 import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolVersion;
+import protocolsupport.injector.pe.PEProxyServerInfoHandler;
 import protocolsupport.protocol.packet.middle.ReadableMiddlePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.LoginHandshakePacket;
+import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.PingHandshakePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.CommandRequestPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromClientChatPacket;
-import protocolsupport.protocol.serializer.VarNumberSerializer;
+import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;
+
+import java.util.List;
 
 public class FromClientPacketDecoder extends MinecraftDecoder {
 
 	protected final PacketIdMiddleTransformerRegistry<ReadableMiddlePacket> registry = new PacketIdMiddleTransformerRegistry<>();
 	{
 		registry.register(Protocol.HANDSHAKE, LoginHandshakePacket.PACKET_ID, LoginHandshakePacket.class);
+		registry.register(Protocol.HANDSHAKE, PEProxyServerInfoHandler.PACKET_ID, PingHandshakePacket.class);
 		registry.register(Protocol.GAME, FromClientChatPacket.PACKET_ID, FromClientChatPacket.class);
 		registry.register(Protocol.GAME, CommandRequestPacket.PACKET_ID, CommandRequestPacket.class);
 	}
@@ -54,7 +57,7 @@ public class FromClientPacketDecoder extends MinecraftDecoder {
 			return;
 		}
 		buf.markReaderIndex();
-		ReadableMiddlePacket transformer = registry.getTransformer(protocol, readPacketId(buf), false);
+		ReadableMiddlePacket transformer = registry.getTransformer(protocol, PEPacketIdSerializer.readPacketId(buf), false);
 		if (transformer == null) {
 			buf.resetReaderIndex();
 			packets.add(new PacketWrapper(null, buf.copy()));
@@ -65,13 +68,6 @@ public class FromClientPacketDecoder extends MinecraftDecoder {
 			}
 			packets.addAll(transformer.toNative());
 		}
-	}
-
-	protected int readPacketId(ByteBuf from) {
-		int id = VarNumberSerializer.readVarInt(from);
-		from.readByte();
-		from.readByte();
-		return id;
 	}
 
 }

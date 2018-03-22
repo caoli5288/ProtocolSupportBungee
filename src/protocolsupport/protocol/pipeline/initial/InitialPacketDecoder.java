@@ -1,7 +1,5 @@
 package protocolsupport.protocol.pipeline.initial;
 
-import java.util.concurrent.TimeUnit;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -12,6 +10,7 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.util.concurrent.Future;
 import net.md_5.bungee.netty.PipelineUtils;
 import protocolsupport.api.ProtocolVersion;
+import protocolsupport.injector.pe.PEProxyServerInfoHandler;
 import protocolsupport.protocol.ConnectionImpl;
 import protocolsupport.protocol.pipeline.ChannelHandlers;
 import protocolsupport.protocol.pipeline.IPipeLineBuilder;
@@ -27,6 +26,8 @@ import protocolsupport.utils.Utils;
 import protocolsupport.utils.netty.Decompressor;
 import protocolsupport.utils.netty.ReplayingDecoderBuffer;
 import protocolsupport.utils.netty.ReplayingDecoderBuffer.EOFSignal;
+
+import java.util.concurrent.TimeUnit;
 
 
 public class InitialPacketDecoder extends SimpleChannelInboundHandler<ByteBuf> {
@@ -188,6 +189,10 @@ public class InitialPacketDecoder extends SimpleChannelInboundHandler<ByteBuf> {
 			}
 			case 0x01: { // pe handshake
 				setProtocol(channel, ProtocolUtils.readPEHandshake(firstpacketdata));
+				break;
+			}
+			case PEProxyServerInfoHandler.PACKET_ID: {
+				setProtocol(channel, ProtocolVersion.MINECRAFT_PE);
 				break;
 			}
 			default: {

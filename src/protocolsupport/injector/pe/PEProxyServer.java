@@ -16,13 +16,13 @@ public class PEProxyServer {
 	public void start() {
 		(peserver = new RakNetServer(
 				listener,
-				PENetServerConstants.PING_HANDLER,
+				new PEProxyServerInfoHandler(),
 				channel -> {
 					ChannelPipeline pipeline = channel.pipeline();
 					pipeline.addLast(new PECompressor());
 					pipeline.addLast(new PEDecompressor());
-					pipeline.addLast(new PEProxyNetworkManager());
-				}, PENetServerConstants.USER_PACKET_ID
+					pipeline.addLast(PEProxyNetworkManager.NAME, new PEProxyNetworkManager());
+				}, 0xFE
 		)).start();
 	}
 
