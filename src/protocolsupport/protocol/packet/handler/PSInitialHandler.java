@@ -103,6 +103,7 @@ public class PSInitialHandler extends InitialHandler {
 	public void handle(LoginRequest loginRequest) throws Exception {
 		Preconditions.checkState(state == LoginState.HELLO, "Not expecting USERNAME");
 		state = LoginState.ONLINEMODERESOLVE;
+		this.loginRequest = loginRequest;
 		username = loginRequest.getData();
 		if (getName().contains(".")) {
 			disconnect(BungeeCord.getInstance().getTranslation("name_invalid"));
@@ -121,19 +122,23 @@ public class PSInitialHandler extends InitialHandler {
 			disconnect(BungeeCord.getInstance().getTranslation("already_connected_proxy"));
 			return;
 		}
-		BungeeCord.getInstance().getPluginManager().callEvent(new PreLoginEvent(this, new Callback<PreLoginEvent>() {
-			@Override
-			public void done(PreLoginEvent result, Throwable error) {
-				if (result.isCancelled()) {
-					disconnect(result.getCancelReasonComponents());
-					return;
-				}
-				if (!isConnected()) {
-					return;
-				}
-				processLoginStart();
-			}
-		}));
+		BungeeCord.getInstance().getPluginManager().callEvent(new PreLoginEvent(this, (result, error) -> {
+            if (result.isCancelled()) {
+                disconnect(result.getCancelReasonComponents());
+                return;
+            }
+            if (!isConnected()) {
+                return;
+            }
+            processLoginStart();
+        }));
+	}
+
+	private LoginRequest loginRequest;
+
+	@Override
+	public LoginRequest getLoginRequest() {
+		return loginRequest;
 	}
 
 	@Override
