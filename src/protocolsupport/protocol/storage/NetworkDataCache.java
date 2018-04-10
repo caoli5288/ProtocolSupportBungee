@@ -1,5 +1,8 @@
 package protocolsupport.protocol.storage;
 
+import gnu.trove.impl.hash.TLongHash;
+import gnu.trove.procedure.TLongProcedure;
+import gnu.trove.set.hash.TLongHashSet;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
@@ -59,4 +62,19 @@ public class NetworkDataCache {
 	public Map<PlayerListItem, ByteBuf> getLastTabList() {
 		return lastTabList;
 	}
+
+	private final TLongHashSet watchedEntities = new TLongHashSet(1 << 10);
+
+	public TLongHashSet getWatchedEntities() {
+		return watchedEntities;
+	}
+
+	public void addWatchedEntity(long id) {
+		watchedEntities.add(id);
+	}
+
+	public void removeWatchedEntity(long id) {
+		watchedEntities.remove(id);
+	}
+
 }
