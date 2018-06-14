@@ -13,7 +13,7 @@ import protocolsupport.protocol.serializer.StringSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.utils.netty.Allocator;
 
-public class LoginPacket extends WriteableMiddlePacket<Login> {
+public class StartGamePacket extends WriteableMiddlePacket<Login> {
 
 	private static final String levelId = UUID.randomUUID().toString();
 
@@ -59,6 +59,7 @@ public class LoginPacket extends WriteableMiddlePacket<Login> {
 		MiscSerializer.writeLFloat(startgame, 0); //z
 		MiscSerializer.writeLFloat(startgame, 0); //yaw
 		MiscSerializer.writeLFloat(startgame, 0); //pitch
+		// LEVEL SETTING
 		VarNumberSerializer.writeSVarInt(startgame, 0); //seed
 		VarNumberSerializer.writeSVarInt(startgame, getPeDimensionId(packet.getDimension()));
 		VarNumberSerializer.writeSVarInt(startgame, 1); //world type (1 - infinite)
@@ -70,6 +71,7 @@ public class LoginPacket extends WriteableMiddlePacket<Login> {
 		startgame.writeBoolean(false); //disable achievements
 		VarNumberSerializer.writeSVarInt(startgame, 0); //time
 		startgame.writeBoolean(false); //edu mode
+		startgame.writeBoolean(false); //edu features
 		MiscSerializer.writeLFloat(startgame, 0); //rain level
 		MiscSerializer.writeLFloat(startgame, 0); //lighting level
 		startgame.writeBoolean(true); //is multiplayer
@@ -79,9 +81,15 @@ public class LoginPacket extends WriteableMiddlePacket<Login> {
 		startgame.writeBoolean(false); //needs texture pack
 		VarNumberSerializer.writeVarInt(startgame, 0); //game rules
 		startgame.writeBoolean(false); //bonus chest enabled
+		startgame.writeBoolean(false);// map enabled
 		startgame.writeBoolean(false); //trust players
 		VarNumberSerializer.writeSVarInt(startgame, 1); //permission level
 		VarNumberSerializer.writeSVarInt(startgame, 4); //game publish setting
+		startgame.writeIntLE(4); //chunk tick radius
+		startgame.writeBoolean(false); // can Platformbroadcast
+		VarNumberSerializer.writeVarInt(startgame, 0); //Broadcast mode
+		startgame.writeBoolean(false); //Broadcast intent
+		// END LEVEL SETTING
 		StringSerializer.writeVarIntUTF8String(startgame, levelId);
 		StringSerializer.writeVarIntUTF8String(startgame, ""); //level name (will packet.getLevelType() work?)
 		StringSerializer.writeVarIntUTF8String(startgame, ""); //template pack id

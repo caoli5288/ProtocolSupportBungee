@@ -32,40 +32,18 @@ public class LoginPacket extends PEDefinedReadableMiddlePacket {
 		VarNumberSerializer.readVarLong(from); //entity id (but it's actually signed varlong, so we use the field below, which is unsigned)
 		entityId = (int) VarNumberSerializer.readVarLong(from);
 		gamemode = (byte) VarNumberSerializer.readSVarInt(from);
-		MiscSerializer.readLFloat(from); //x
-		MiscSerializer.readLFloat(from); //y
-		MiscSerializer.readLFloat(from); //z
-		MiscSerializer.readLFloat(from); //yaw
-		MiscSerializer.readLFloat(from); //pitch
+		from.readFloatLE(); //x
+		from.readFloatLE(); //y
+		from.readFloatLE(); //z
+		from.readFloatLE(); //yaw
+		from.readFloatLE(); //pitch
+		// LEVEL SETTING
 		VarNumberSerializer.readSVarInt(from); //seed
 		dimension = getPcDimension(VarNumberSerializer.readSVarInt(from));
 		VarNumberSerializer.readSVarInt(from); //world type (1 - infinite)
 		VarNumberSerializer.readSVarInt(from); // world gamemode (SURVIVAL)
 		difficulty = VarNumberSerializer.readSVarInt(from);
-		VarNumberSerializer.readSVarInt(from); //world spawn x
-		VarNumberSerializer.readVarInt(from); //world spawn y
-		VarNumberSerializer.readSVarInt(from); //world spawn z
-		from.readBoolean(); //disable achievements
-		VarNumberSerializer.readSVarInt(from); //time
-		from.readBoolean(); //edu mode
-		MiscSerializer.readLFloat(from); //rain level
-		MiscSerializer.readLFloat(from); //lighting level
-		from.readBoolean(); //is multiplayer
-		from.readBoolean(); //broadcast to lan
-		from.readBoolean(); //broadcast to xbl
-		from.readBoolean(); //commands enabled
-		from.readBoolean(); //needs texture pack
-		VarNumberSerializer.readVarInt(from); //game rules //TODO: actually implement gamerules reading in case pspe will actually send them one day
-		from.readBoolean(); //bonus chest enabled
-		from.readBoolean(); //trust players
-		VarNumberSerializer.readSVarInt(from); //permission level
-		VarNumberSerializer.readSVarInt(from); //game publish setting
-		StringSerializer.readVarIntUTF8String(from); //level id (pe one)
-		StringSerializer.readVarIntUTF8String(from); //level name (will packet.getLevelType() work?)
-		StringSerializer.readVarIntUTF8String(from); //template pack id
-		from.readBoolean(); //is trial
-		from.readLong(); //level time
-		VarNumberSerializer.readSVarInt(from); //enchantment seed
+		from.skipBytes(from.readableBytes());
 	}
 
 	@Override

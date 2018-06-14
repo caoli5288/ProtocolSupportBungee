@@ -23,7 +23,7 @@ import protocolsupport.protocol.packet.middleimpl.writeable.login.v_pe.LoginSucc
 import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.BossEventPacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.ChangeDimensionPacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.KickPacket;
-import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.LoginPacket;
+import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.StartGamePacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.PlayerListItemPacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.ToClientChatPacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.status.v_pe.StatusResponsePacket;
@@ -35,7 +35,7 @@ public class ToClientPacketEncoder extends AbstractPacketEncoder {
 	{
 		registry.register(EncryptionRequest.class, NoopWriteablePacket.class);
 		registry.register(LoginSuccess.class, LoginSuccessPacket.class);
-		registry.register(Login.class, LoginPacket.class);
+		registry.register(Login.class, StartGamePacket.class);
 		registry.register(StatusResponse.class, StatusResponsePacket.class);
 		registry.register(Kick.class, KickPacket.class);
 		registry.register(KeepAlive.class, NoopWriteablePacket.class);
