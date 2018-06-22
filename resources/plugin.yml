@@ -11,3 +11,4 @@ database:
   password: wowsuchpassword
 
 pocket_listen: '0.0.0.0:19132'
+auth: 'http://x19authserver.nie.netease.com/check'

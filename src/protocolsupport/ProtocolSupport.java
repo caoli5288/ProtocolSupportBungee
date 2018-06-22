@@ -24,68 +24,73 @@ import java.util.Map;
 
 public class ProtocolSupport extends Plugin implements Listener {
 
-	@Getter
-	private static HikariDataSource dataSource;
-	private PEProxyServer peserver;
+    @Getter
+    private static HikariDataSource dataSource;
+    private PEProxyServer peserver;
+    @Getter
+    private static String x19Auth = "http://x19authserver.nie.netease.com/check";
 
-	@SneakyThrows
-	public void onLoad() {
-		try {
-			getProxy().getPluginManager().registerCommand(this, new CommandHandler());
-			BungeeNettyChannelInjector.inject();
-		} catch (Throwable t) {
-			t.printStackTrace();
-			ProxyServer.getInstance().stop();
-		}
-	}
+    @SneakyThrows
+    public void onLoad() {
+        try {
+            getProxy().getPluginManager().registerCommand(this, new CommandHandler());
+            BungeeNettyChannelInjector.inject();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            ProxyServer.getInstance().stop();
+        }
+    }
 
-	@SneakyThrows
-	public void onEnable() {
-		getProxy().getPluginManager().registerListener(this, this);
+    @SneakyThrows
+    public void onEnable() {
+        getProxy().getPluginManager().registerListener(this, this);
 
-		File dataFolder = getDataFolder();
-		if (!dataFolder.isDirectory() && dataFolder.mkdir()) {
-			throw new IllegalStateException("mkdir");
-		}
+        File dataFolder = getDataFolder();
+        if (!dataFolder.isDirectory() && dataFolder.mkdir()) {
+            throw new IllegalStateException("mkdir");
+        }
 
-		File plugin = new File(dataFolder, "plugin.yml");
-		if (!plugin.isFile()) {
-			Files.copy(getResourceAsStream("plugin.yml"), plugin.toPath());
-		}
+        File plugin = new File(dataFolder, "plugin.yml");
+        if (!plugin.isFile()) {
+            Files.copy(getResourceAsStream("plugin.yml"), plugin.toPath());
+        }
 
-		Map<String, ?> load = new Yaml().load(new FileInputStream(plugin));
-		Object convert = load.get("naming_convert");
-		if (!(convert == null) && ((boolean) convert) && load.containsKey("naming_convert_lobby")) {
-			Map<String, String> database = (Map<String, String>) load.get("database");
-			dataSource = new HikariDataSource();
-			dataSource.setJdbcUrl(database.get("url"));
-			dataSource.setUsername(database.get("user"));
-			dataSource.setPassword(database.get("password"));
-			dataSource.getConnection().close();// fast fail if not connected
-			getProxy().getPluginManager().registerListener(this, new NamingConvertListener(load.get("naming_convert_lobby").toString()));
-		}
+        Map<String, ?> load = new Yaml().load(new FileInputStream(plugin));
+        Object convert = load.get("naming_convert");
+        if (!(convert == null) && ((boolean) convert) && load.containsKey("naming_convert_lobby")) {
+            Map<String, String> database = (Map<String, String>) load.get("database");
+            dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl(database.get("url"));
+            dataSource.setUsername(database.get("user"));
+            dataSource.setPassword(database.get("password"));
+            dataSource.getConnection().close();// fast fail if not connected
+            getProxy().getPluginManager().registerListener(this, new NamingConvertListener(load.get("naming_convert_lobby").toString()));
+        }
 
-		String listen = (String) load.get("pocket_listen");
+        String listen = (String) load.get("pocket_listen");
+        if (load.containsKey("auth")) {
+            x19Auth = (String) load.get("auth");
+        }
 
-		(peserver = new PEProxyServer(listen == null ? getProxy().getConfig().getListeners().iterator().next().getHost() : toInetAddr(listen))).start();
-	}
+        (peserver = new PEProxyServer(listen == null ? getProxy().getConfig().getListeners().iterator().next().getHost() : toInetAddr(listen))).start();
+    }
 
-	private InetSocketAddress toInetAddr(String listen) {
-		Iterator<String> itr = Arrays.asList(listen.split(":")).iterator();
-		return new InetSocketAddress(itr.next(), itr.hasNext() ? Integer.valueOf(itr.next()) : 19132);
-	}
+    private InetSocketAddress toInetAddr(String listen) {
+        Iterator<String> itr = Arrays.asList(listen.split(":")).iterator();
+        return new InetSocketAddress(itr.next(), itr.hasNext() ? Integer.valueOf(itr.next()) : 19132);
+    }
 
-	@EventHandler
-	public void handle(ServerSwitchEvent event) {
-		Connection conn = ProtocolSupportAPI.getConnection(event.getPlayer());
-		if (conn.getMetadata("_PE_TRANSFER_") == null) {
-			conn.addMetadata("_PE_TRANSFER_", "");
-		}
-	}
+    @EventHandler
+    public void handle(ServerSwitchEvent event) {
+        Connection conn = ProtocolSupportAPI.getConnection(event.getPlayer());
+        if (conn.getMetadata("_PE_TRANSFER_") == null) {
+            conn.addMetadata("_PE_TRANSFER_", "");
+        }
+    }
 
-	@Override
-	public void onDisable() {
-		peserver.stop();
-	}
+    @Override
+    public void onDisable() {
+        peserver.stop();
+    }
 
 }

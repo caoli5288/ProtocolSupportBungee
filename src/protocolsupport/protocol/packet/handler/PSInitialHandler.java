@@ -44,6 +44,7 @@ import net.md_5.bungee.protocol.packet.EncryptionRequest;
 import net.md_5.bungee.protocol.packet.EncryptionResponse;
 import net.md_5.bungee.protocol.packet.LoginRequest;
 import net.md_5.bungee.protocol.packet.LoginSuccess;
+import protocolsupport.ProtocolSupport;
 import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolType;
 import protocolsupport.api.ProtocolVersion;
@@ -324,7 +325,6 @@ public class PSInitialHandler extends InitialHandler {
 			sha.update(bit);
 		}
 		String serverId = new BigInteger(sha.digest()).toString(16);
-		String authURL = "http://x19authserver.nie.netease.com/check";
 		ValidReq validReq = new ValidReq(getName(), serverId);
 		Callback<String> handler = (result, error) -> {
 			if (error == null) {
@@ -346,7 +346,7 @@ public class PSInitialHandler extends InitialHandler {
 				BungeeCord.getInstance().getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
 			}
 		};
-		Http.post(authURL, validReq, channel.getHandle().eventLoop(), handler);
+		Http.post(ProtocolSupport.getX19Auth(), validReq, channel.getHandle().eventLoop(), handler);
 	}
 
 	protected static boolean isFullEncryption(ProtocolVersion version) {
