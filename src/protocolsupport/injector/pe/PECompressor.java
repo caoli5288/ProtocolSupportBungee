@@ -10,22 +10,29 @@ import protocolsupport.utils.netty.Compressor;
 
 public class PECompressor extends MessageToByteEncoder<ByteBuf> {
 
-	private final ByteBuf packbuffer = Allocator.allocateBuffer();
-	private final Compressor compressor = Compressor.create();
+    private final ByteBuf buf = Allocator.allocateBuffer();
+    private final int threshold;
+    private final Compressor fast = Compressor.create(3);
 
-	@Override
-	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		super.handlerRemoved(ctx);
-		packbuffer.release();
-		compressor.recycle();
-	}
+    public PECompressor(int threshold) {
+        this.threshold = Math.max(128, threshold);
+    }
 
-	@Override
-	protected void encode(ChannelHandlerContext ctx, ByteBuf buf, ByteBuf out) throws Exception {
-		packbuffer.clear();
-		VarNumberSerializer.writeVarInt(packbuffer, buf.readableBytes());
-		packbuffer.writeBytes(buf);
-		out.writeBytes(compressor.compress(MiscSerializer.readAllBytes(packbuffer)));
-	}
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        buf.release();
+    }
+
+    private final Compressor noop = Compressor.create(0);
+
+    @Override
+    protected void encode(ChannelHandlerContext ctx, ByteBuf buf, ByteBuf out) throws Exception {
+        this.buf.clear();
+        int len = buf.readableBytes();
+        VarNumberSerializer.writeVarInt(this.buf, len);
+        this.buf.writeBytes(buf);
+        Compressor compressor = len < threshold ? noop : fast;
+        out.writeBytes(compressor.compress(MiscSerializer.readAllBytes(this.buf)));
+    }
 
 }

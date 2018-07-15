@@ -9,17 +9,12 @@ import protocolsupport.utils.netty.Compressor;
 
 public class PacketCompressor extends MessageToByteEncoder<ByteBuf> {
 
-	private final Compressor compressor = Compressor.create();
+	private final Compressor compressor;
 	private final int threshold;
 
-	public PacketCompressor(int threshold) {
+	public PacketCompressor(int level, int threshold) {
 		this.threshold = threshold;
-	}
-
-	@Override
-	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		super.handlerRemoved(ctx);
-		compressor.recycle();
+		compressor = Compressor.create(level);
 	}
 
 	@Override

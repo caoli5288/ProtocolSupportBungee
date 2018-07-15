@@ -8,6 +8,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.concurrent.Future;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.netty.PipelineUtils;
 import protocolsupport.api.ProtocolVersion;
 import protocolsupport.injector.pe.PEProxyServerInfoHandler;
@@ -213,7 +214,7 @@ public class InitialPacketDecoder extends SimpleChannelInboundHandler<ByteBuf> {
 			pipeline.replace(PipelineUtils.FRAME_DECODER, PipelineUtils.FRAME_DECODER, new VarIntFrameDecoder());
 			if (encapsulatedinfo.hasCompression()) {
 				pipeline.addAfter(PipelineUtils.FRAME_DECODER, "decompress", new PacketDecompressor());
-				pipeline.addAfter(PipelineUtils.FRAME_PREPENDER, "compress", new PacketCompressor(256));
+				pipeline.addAfter(PipelineUtils.FRAME_PREPENDER, "compress", new PacketCompressor(3, BungeeCord.getInstance().config.getCompressionThreshold()));
 			}
 			if ((encapsulatedinfo.getAddress() != null) && connection.getRawAddress().getAddress().isLoopbackAddress()) {
 				connection.changeAddress(encapsulatedinfo.getAddress());

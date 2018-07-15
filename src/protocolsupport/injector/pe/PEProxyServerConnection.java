@@ -67,7 +67,7 @@ public class PEProxyServerConnection extends SimpleChannelInboundHandler<ByteBuf
 				.addLast("keepalive", new EncapsulatedConnectionKeepAlive())
 				.addLast("prepender", new Varint21LengthFieldPrepender())
 				.addLast("splitter", new VarIntFrameDecoder())
-				.addLast("compress", new PacketCompressor(BungeeCord.getInstance().config.getCompressionThreshold()))
+				.addLast("compress", new PacketCompressor(1, BungeeCord.getInstance().config.getCompressionThreshold()))
 				.addLast("decompress", new PacketDecompressor())
 				.addLast("handler", new PEProxyServerConnection(peclientchannel, handshakepacket));
 			}

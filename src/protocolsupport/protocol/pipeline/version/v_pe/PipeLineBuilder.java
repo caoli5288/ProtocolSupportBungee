@@ -2,6 +2,7 @@ package protocolsupport.protocol.pipeline.version.v_pe;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.connection.DownstreamBridge;
 import net.md_5.bungee.connection.UpstreamBridge;
@@ -49,7 +50,7 @@ public class PipeLineBuilder extends IPipeLineBuilder {
 		NetworkDataCache cache = NetworkDataCache.getFrom(connection);
 		pipeline.replace(PipelineUtils.PACKET_DECODER, PipelineUtils.PACKET_DECODER, new FromServerPacketDecoder(connection, cache));
 		pipeline.replace(PipelineUtils.PACKET_ENCODER, PipelineUtils.PACKET_ENCODER, new ToServerPacketEncoder(connection, cache));
-		pipeline.addAfter(PipelineUtils.FRAME_PREPENDER, "compress", new PacketCompressor(256));
+		pipeline.addAfter(PipelineUtils.FRAME_PREPENDER, "compress", new PacketCompressor(1, BungeeCord.getInstance().config.getCompressionThreshold()));
 		pipeline.addAfter(PipelineUtils.FRAME_DECODER, "decompress", new PacketDecompressor());
 		pipeline.get(CustomHandlerBoss.class).setPacketHandlerChangeListener(listener -> {
 			try {
