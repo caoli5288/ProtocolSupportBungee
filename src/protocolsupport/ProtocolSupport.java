@@ -13,6 +13,7 @@ import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.injector.BungeeNettyChannelInjector;
 import protocolsupport.injector.pe.PEProxyServer;
+import protocolsupport.protocol.DimensionUpdate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +45,7 @@ public class ProtocolSupport extends Plugin implements Listener {
     @SneakyThrows
     public void onEnable() {
         getProxy().getPluginManager().registerListener(this, this);
+        getProxy().getPluginManager().registerListener(this, new DimensionUpdate());
 
         File dataFolder = getDataFolder();
         if (!dataFolder.isDirectory() && dataFolder.mkdir()) {

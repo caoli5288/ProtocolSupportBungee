@@ -1,15 +1,15 @@
 package protocolsupport.protocol.storage;
 
-import gnu.trove.impl.hash.TLongHash;
-import gnu.trove.procedure.TLongProcedure;
 import gnu.trove.set.hash.TLongHashSet;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.internal.RecyclableArrayList;
 import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import org.apache.commons.lang3.Validate;
 import protocolsupport.api.Connection;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -75,6 +75,26 @@ public class NetworkDataCache {
 
 	public void removeWatchedEntity(long id) {
 		watchedEntities.remove(id);
+	}
+
+	private LinkedList<RecyclableArrayList> dimUpdateQueue = new LinkedList<>();
+
+	public void dimUpdate(RecyclableArrayList list) {
+		dimUpdateQueue.add(list);
+	}
+
+	public RecyclableArrayList dimUpdate() {
+		return dimUpdateQueue.poll();
+	}
+
+	public boolean dimQueue() {
+		return !dimUpdateQueue.isEmpty();
+	}
+
+	private boolean yFakeFlag;
+
+	public int updateFakeY() {
+		return (yFakeFlag = !yFakeFlag) ? 20 : 30;
 	}
 
 }

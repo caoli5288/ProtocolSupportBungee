@@ -7,6 +7,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
 import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
+import protocolsupport.protocol.serializer.VarInt;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 
 import java.util.ArrayList;
@@ -64,13 +65,16 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
             UUID read(ByteBuf buf) {
                 UUID id = MiscSerializer.readUUIDLE(buf);
                 VarNumberSerializer.readVarInt(buf);// Entity id
-                String name = StringSerializer.readVarIntUTF8String(buf);
+                StringSerializer.readVarIntUTF8String(buf);// name
+                StringSerializer.readVarIntUTF8String(buf);// 3rd party
+                VarInt.readVarInt(buf);
                 StringSerializer.readVarIntUTF8String(buf);
                 StringSerializer.readVarIntUTF8String(buf);
                 StringSerializer.readVarIntUTF8String(buf);
                 StringSerializer.readVarIntUTF8String(buf);
                 StringSerializer.readVarIntUTF8String(buf);
-                StringSerializer.readVarIntUTF8String(buf);
+                StringSerializer.readVarIntUTF8String(buf);// x-uid
+                StringSerializer.readVarIntUTF8String(buf);// platform chat id
                 return id;
             }
         },
