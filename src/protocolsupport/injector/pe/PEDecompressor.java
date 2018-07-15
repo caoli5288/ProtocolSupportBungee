@@ -14,32 +14,30 @@ import java.util.zip.Inflater;
 
 public class PEDecompressor extends MessageToMessageDecoder<ByteBuf> {
 
-	private static final int MAXLENGTH = 2 << 21;
+    private static final ThreadLocal<byte[]> LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[2 << 21]);
+    private final Inflater inflater = new Inflater();
 
-	private final Inflater inflater = new Inflater();
-	private final byte[] decompressionbuffer = new byte[MAXLENGTH];
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        inflater.end();
+    }
 
-	@Override
-	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		super.handlerRemoved(ctx);
-		inflater.end();
-	}
-
-	@Override
-	protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> output) throws Exception {
-		try {
-			inflater.setInput(MiscSerializer.readAllBytes(buf));
-			int decompressedlength = inflater.inflate(decompressionbuffer);
-			if (!inflater.finished()) {
-				throw new DecoderException(MessageFormat.format("Badly compressed packet - size is larger than protocol maximum of {0}", MAXLENGTH));
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> output) throws Exception {
+        try {
+            inflater.setInput(MiscSerializer.readAllBytes(buf));
+            byte[] decompressionbuffer = LOCAL_BUF.get();
+            int decompressedlength = inflater.inflate(decompressionbuffer);
+            if (!inflater.finished()) {
+                throw new DecoderException(MessageFormat.format("Badly compressed packet - size is larger than protocol maximum of {0}", decompressionbuffer.length));
             }
-			ByteBuf uncompresseddata = Unpooled.wrappedBuffer(decompressionbuffer, 0, decompressedlength);
-			while (uncompresseddata.isReadable()) {
-				output.add(Unpooled.wrappedBuffer(MiscSerializer.readBytes(uncompresseddata, VarNumberSerializer.readVarInt(uncompresseddata))));
+            ByteBuf uncompresseddata = Unpooled.wrappedBuffer(decompressionbuffer, 0, decompressedlength);
+            while (uncompresseddata.isReadable()) {
+                output.add(Unpooled.wrappedBuffer(MiscSerializer.readBytes(uncompresseddata, VarNumberSerializer.readVarInt(uncompresseddata))));
             }
-		} finally {
-			inflater.reset();
-		}
-	}
+        } finally {
+            inflater.reset();
+        }
+    }
 
 }
