@@ -1,14 +1,11 @@
 package protocolsupport.injector.pe;
 
-import java.net.InetSocketAddress;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import net.md_5.bungee.BungeeCord;
@@ -20,7 +17,9 @@ import protocolsupport.protocol.pipeline.common.PacketDecompressor;
 import protocolsupport.protocol.pipeline.common.VarIntFrameDecoder;
 import protocolsupport.utils.netty.ChannelInitializer;
 
-public class PEProxyServerConnection extends SimpleChannelInboundHandler<ByteBuf> {
+import java.net.InetSocketAddress;
+
+public class PEProxyServerConnection extends ChannelInboundHandlerAdapter {
 
 	protected final Channel clientconnection;
 	protected final ByteBuf handshakepacket;
@@ -35,13 +34,17 @@ public class PEProxyServerConnection extends SimpleChannelInboundHandler<ByteBuf
 	}
 
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, ByteBuf bytebuf) throws Exception {
-		clientconnection.writeAndFlush(Unpooled.copiedBuffer(bytebuf)).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		clientconnection.write(msg).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+	}
+
+	@Override
+	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+		clientconnection.flush();
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		System.err.println("PE proxy server connection exception occured");
 		cause.printStackTrace();
 		ctx.channel().close();
 	}
