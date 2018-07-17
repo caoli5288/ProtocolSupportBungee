@@ -66,12 +66,13 @@ public class PEProxyServerConnection extends ChannelInboundHandlerAdapter {
 			@Override
 			protected void initChannel(Channel channel) throws Exception {
 				channel.pipeline()
-				.addLast("ps-encap-hs-sender", new EncapsulatedHandshakeSender(remote, true))
+//				.addLast("ps-encap-hs-sender", new EncapsulatedHandshakeSender(remote, true))
+				.addLast("ps-encap-hs-sender", new EncapsulatedHandshakeSender(remote, false))
 				.addLast("keepalive", new EncapsulatedConnectionKeepAlive())
 				.addLast("prepender", new Varint21LengthFieldPrepender())
 				.addLast("splitter", new VarIntFrameDecoder())
-				.addLast("compress", new PacketCompressor(1, BungeeCord.getInstance().config.getCompressionThreshold()))
-				.addLast("decompress", new PacketDecompressor())
+//				.addLast("compress", new PacketCompressor(1, BungeeCord.getInstance().config.getCompressionThreshold()))
+//				.addLast("decompress", new PacketDecompressor())
 				.addLast("handler", new PEProxyServerConnection(peclientchannel, handshakepacket));
 			}
 		})

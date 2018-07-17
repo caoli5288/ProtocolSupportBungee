@@ -1,25 +1,24 @@
 package protocolsupport.injector.pe;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
-public class PEProxyNetworkManager extends SimpleChannelInboundHandler<ByteBuf> {
+public class PEProxyNetworkManager extends ChannelInboundHandlerAdapter {
 
 	public static final String NAME = "peproxy-nm";
 
 	protected Channel serverconnection;
 
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, ByteBuf bytebuf) throws Exception {
-		ByteBuf cbytebuf = Unpooled.copiedBuffer(bytebuf);
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		ByteBuf buf = (ByteBuf) msg;
 		if (serverconnection == null) {
-			serverconnection = PEProxyServerConnection.connectToServer(ctx.channel(), cbytebuf);
+			serverconnection = PEProxyServerConnection.connectToServer(ctx.channel(), buf);
 		} else {
-			serverconnection.eventLoop().execute(() -> serverconnection.writeAndFlush(cbytebuf).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE));
+			serverconnection.writeAndFlush(buf).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 		}
 	}
 
