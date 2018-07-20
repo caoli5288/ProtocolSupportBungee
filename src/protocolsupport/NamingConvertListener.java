@@ -9,6 +9,7 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import protocolsupport.api.ProtocolType;
 import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.ConnectionImpl;
 import protocolsupport.protocol.packet.handler.PSInitialHandler;
@@ -34,7 +35,7 @@ public class NamingConvertListener implements Listener {
         PSInitialHandler connection = (PSInitialHandler) event.getConnection();
         ConnectionImpl l = RefHelper.getField(connection, "connection");
         try {
-            String lookup = lookupLocal(connection.getUniqueId(), connection.getName(), l.getVersion() == ProtocolVersion.MINECRAFT_PE);
+            String lookup = lookupLocal(connection.getUniqueId(), connection.getName(), l.getVersion().getProtocolType() == ProtocolType.PE);
             if (lookup == null) {
                 handled.add(connection.getUniqueId());
             } else {
@@ -47,7 +48,7 @@ public class NamingConvertListener implements Listener {
             @Cleanup PreparedStatement sql = conn.prepareStatement("insert into localprofile(id, name_origin, pc_pe) value(? ,?, ?)");
             sql.setString(1, connection.getUniqueId().toString());
             sql.setString(2, connection.getName());
-            sql.setString(3, l.getVersion() == ProtocolVersion.MINECRAFT_PE ? "pe" : "pc");
+            sql.setString(3, l.getVersion().getProtocolType() == ProtocolType.PE ? "pe" : "pc");
             sql.executeUpdate();
         }
     }

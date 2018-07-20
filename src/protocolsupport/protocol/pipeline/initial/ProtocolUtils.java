@@ -2,6 +2,8 @@ package protocolsupport.protocol.pipeline.initial;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
+import protocolsupport.ProtocolSupport;
+import protocolsupport.api.ProtocolType;
 import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.protocol.utils.ProtocolVersionsHelper;
@@ -42,14 +44,14 @@ public class ProtocolUtils {
 		data.readByte();
 		data.readByte();
 		int incomingversion = data.readInt();
-		int cversion = ProtocolVersion.MINECRAFT_PE.getId();
-		if (incomingversion == cversion) {
-			return ProtocolVersion.MINECRAFT_PE;
-		} else if (incomingversion < cversion) {
+		ProtocolVersion version = ProtocolVersion.fromId(incomingversion);
+		if (version == ProtocolVersion.UNKNOWN) {
+			if (incomingversion > ProtocolVersion.getLatest(ProtocolType.PE).getId()) {
+				return ProtocolVersion.MINECRAFT_PE_FUTURE;
+			}
 			return ProtocolVersion.MINECRAFT_PE_LEGACY;
-		} else {
-			return ProtocolVersion.MINECRAFT_PE_FUTURE;
 		}
+		return version;
 	}
 
 }
