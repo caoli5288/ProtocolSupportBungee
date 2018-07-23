@@ -1,4 +1,4 @@
-package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe;
+package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15;
 
 import java.text.MessageFormat;
 import java.util.Collection;

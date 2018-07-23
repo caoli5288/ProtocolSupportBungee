@@ -1,4 +1,4 @@
-package protocolsupport.protocol.pipeline.version.v_pe;
+package protocolsupport.protocol.pipeline.version.v_pe_14_15;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,8 +12,8 @@ import protocolsupport.injector.pe.PEProxyServerInfoHandler;
 import protocolsupport.protocol.packet.middle.ReadableMiddlePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.LoginHandshakePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.PingHandshakePacket;
-import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.CommandRequestPacket;
-import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromClientChatPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.CommandRequestPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromClientChatPacket;
 import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;

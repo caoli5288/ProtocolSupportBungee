@@ -1,4 +1,4 @@
-package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe;
+package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

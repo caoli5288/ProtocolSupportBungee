@@ -3,7 +3,7 @@ package protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.packet.PluginMessage;
-import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromServerPluginMessagePacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerPluginMessagePacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.PESingleWriteablePacket;
 import protocolsupport.protocol.serializer.ArraySerializer;
 import protocolsupport.protocol.serializer.StringSerializer;

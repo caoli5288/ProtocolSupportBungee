@@ -2,7 +2,7 @@ package protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe;
 
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.Chat;
-import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe.FromClientChatPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromClientChatPacket;
 import protocolsupport.protocol.packet.middleimpl.writeable.PESingleWriteablePacket;
 import protocolsupport.protocol.serializer.StringSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;

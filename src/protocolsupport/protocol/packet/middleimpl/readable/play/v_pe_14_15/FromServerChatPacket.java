@@ -1,4 +1,4 @@
-package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe;
+package protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,29 +8,33 @@ import io.netty.buffer.Unpooled;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.protocol.PacketWrapper;
-import net.md_5.bungee.protocol.packet.Kick;
+import net.md_5.bungee.protocol.packet.Chat;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
 import protocolsupport.protocol.serializer.StringSerializer;
 
-public class KickPacket extends PEDefinedReadableMiddlePacket {
+public class FromServerChatPacket extends PEDefinedReadableMiddlePacket {
 
-	public static final int PACKET_ID = 5;
+	public static final int PACKET_ID = 9;
 
-	public KickPacket() {
+	public FromServerChatPacket() {
 		super(PACKET_ID);
 	}
 
+	protected byte type;
 	protected String message;
 
 	@Override
 	protected void read0(ByteBuf from) {
-		from.readBoolean(); //hide disconnection screen
+		type = (byte) (from.readUnsignedByte() == 5 ? 2 : 0);
+		from.readBoolean(); //needs translation
 		message = ComponentSerializer.toString(new TextComponent(StringSerializer.readVarIntUTF8String(from)));
+		StringSerializer.readVarIntUTF8String(from); //Xbox user ID
+		StringSerializer.readVarIntUTF8String(from); //Platform Chat ID
 	}
 
 	@Override
 	public Collection<PacketWrapper> toNative() {
-		return Collections.singletonList(new PacketWrapper(new Kick(message), Unpooled.wrappedBuffer(readbytes)));
+		return Collections.singletonList(new PacketWrapper(new Chat(message, type), Unpooled.wrappedBuffer(readbytes)));
 	}
 
 }

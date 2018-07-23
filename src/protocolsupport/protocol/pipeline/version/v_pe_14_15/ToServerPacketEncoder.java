@@ -1,4 +1,4 @@
-package protocolsupport.protocol.pipeline.version.v_pe;
+package protocolsupport.protocol.pipeline.version.v_pe_14_15;
 
 import net.md_5.bungee.protocol.packet.Chat;
 import net.md_5.bungee.protocol.packet.ClientStatus;
