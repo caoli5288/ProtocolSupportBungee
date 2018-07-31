@@ -13,7 +13,6 @@
 
 plugins {
 	id 'java'
-	id 'de.undercouch.download' version '3.1.1'
     id 'io.franzbecker.gradle-lombok' version '1.11'
 }
 
@@ -28,22 +27,10 @@ version '1.4.dev'
 
 sourceCompatibility = 1.8
 
-import de.undercouch.gradle.tasks.download.Download
-
 File dllibs = new File('dllibs')
 dllibs.mkdirs()
 
-task updateLibs(type: Download) {
-	src([
-		'https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/bootstrap/target/BungeeCord.jar'
-	])
-	dest dllibs
-	onlyIfNewer true
-	overwrite false
-}
-
 compileJava.dependsOn(clean)
-compileJava.dependsOn(updateLibs)
 
 sourceSets {
 	main {
@@ -65,7 +52,6 @@ dependencies {
 	compile files(new File(dllibs, 'RakNetServer.jar'), new File(dllibs, "authlib.jar"), new File(dllibs, "UdpServerSocketChannel.jar"))
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 	compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.2'
-	compile "com.zaxxer:HikariCP:2.7.8"
 }
 
  configurations {

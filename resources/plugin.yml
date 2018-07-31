@@ -3,12 +3,5 @@ main: protocolsupport.ProtocolSupport
 version: 1.4.dev
 author: _Shevchik_
 
-naming_convert_lobby: naming
-naming_convert: true
-database:
-  url: jdbc:mysql://localhost/db
-  user: root
-  password: wowsuchpassword
-
 pocket_listen: '0.0.0.0:19132'
 auth: 'http://x19authserver.nie.netease.com/check'

@@ -1,6 +1,5 @@
 package protocolsupport;
 
-import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
@@ -25,8 +24,6 @@ import java.util.Map;
 
 public class ProtocolSupport extends Plugin implements Listener {
 
-    @Getter
-    private static HikariDataSource dataSource;
     private PEProxyServer peserver;
     @Getter
     private static String x19Auth = "http://x19authserver.nie.netease.com/check";
@@ -58,16 +55,6 @@ public class ProtocolSupport extends Plugin implements Listener {
         }
 
         Map<String, ?> load = new Yaml().load(new FileInputStream(plugin));
-        Object convert = load.get("naming_convert");
-        if (!(convert == null) && ((boolean) convert) && load.containsKey("naming_convert_lobby")) {
-            Map<String, String> database = (Map<String, String>) load.get("database");
-            dataSource = new HikariDataSource();
-            dataSource.setJdbcUrl(database.get("url"));
-            dataSource.setUsername(database.get("user"));
-            dataSource.setPassword(database.get("password"));
-            dataSource.getConnection().close();// fast fail if not connected
-            getProxy().getPluginManager().registerListener(this, new NamingConvertListener(load.get("naming_convert_lobby").toString()));
-        }
 
         String listen = (String) load.get("pocket_listen");
         if (load.containsKey("auth")) {
