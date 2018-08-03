@@ -11,6 +11,7 @@ import protocolsupport.api.Connection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 
 public class NetworkDataCache {
@@ -57,9 +58,9 @@ public class NetworkDataCache {
 		return peClientUUID;
 	}
 
-	private final Map<PlayerListItem, ByteBuf> lastTabList = new HashMap<>();
+	private final Queue<ByteBuf> lastTabList = new LinkedList<>();
 
-	public Map<PlayerListItem, ByteBuf> getLastTabList() {
+	public Queue<ByteBuf> getLastTabList() {
 		return lastTabList;
 	}
 

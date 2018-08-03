@@ -45,7 +45,9 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
     public Collection<PacketWrapper> toNative() {
         PlayerListItem pk = tonative();
         ByteBuf buf = Unpooled.wrappedBuffer(readbytes);
-        cache.getLastTabList().put(pk, buf);
+        if (action == Action.ADD_PLAYER) {
+            cache.getLastTabList().add(buf);
+        }
         return Collections.singletonList(new PacketWrapper(pk, Unpooled.EMPTY_BUFFER));
     }
 
