@@ -25,7 +25,7 @@ public class LogicHandler extends ChannelDuplexHandler {
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		super.channelInactive(ctx);
 		ProxyServer.getInstance().getPluginManager().callEvent(new ConnectionCloseEvent(connection));
-		ProtocolStorage.removeConnection(connection.getAddress());
+		ProtocolStorage.removeConnection(connection.getRawAddress());
 	}
 
 }
