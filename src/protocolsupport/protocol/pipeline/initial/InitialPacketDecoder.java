@@ -194,7 +194,7 @@ public class InitialPacketDecoder extends SimpleChannelInboundHandler<ByteBuf> {
 			}
 			case PEProxyServerInfoHandler.PACKET_ID: {
 				setProtocol(channel, ProtocolVersion.MINECRAFT_PE);
-				System.out.println("PE client");
+//				System.out.println("PE client");
 				break;
 			}
 			default: {

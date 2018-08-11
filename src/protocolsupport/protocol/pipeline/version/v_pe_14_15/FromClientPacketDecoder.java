@@ -3,6 +3,7 @@ package protocolsupport.protocol.pipeline.version.v_pe_14_15;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.protocol.MinecraftDecoder;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.Protocol;
@@ -70,4 +71,11 @@ public class FromClientPacketDecoder extends MinecraftDecoder {
 		}
 	}
 
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {// catch authlib's exception
+		if (ctx.channel().isActive()) {
+			ProxyServer.getInstance().getLogger().warning("Exception in from client packet decoder " + cause);
+			ctx.close();
+		}
+	}
 }
