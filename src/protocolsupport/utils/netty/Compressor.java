@@ -16,11 +16,11 @@ public class Compressor{
     }
 
     public byte[] compress(byte[] input) {
+        deflater.reset();
         deflater.setInput(input);
         deflater.finish();
         byte[] compressedbuf = new byte[((input.length * 11) / 10) + 50];
         int size = deflater.deflate(compressedbuf);
-        deflater.reset();
         return Arrays.copyOf(compressedbuf, size);
     }
 

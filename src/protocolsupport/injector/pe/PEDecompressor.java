@@ -1,6 +1,7 @@
 package protocolsupport.injector.pe;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
@@ -14,8 +15,12 @@ import java.util.zip.Inflater;
 
 public class PEDecompressor extends MessageToMessageDecoder<ByteBuf> {
 
-    private static final ThreadLocal<byte[]> LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[2 << 21]);
-    private final Inflater inflater = new Inflater();
+    private Inflater inflater;
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        inflater = new Inflater();
+    }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
@@ -23,20 +28,21 @@ public class PEDecompressor extends MessageToMessageDecoder<ByteBuf> {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> output) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> output) throws Exception {
+        ByteBuf decompression = ByteBufAllocator.DEFAULT.heapBuffer();
         try {
-            inflater.setInput(MiscSerializer.readAllBytes(buf));
-            byte[] decompressionbuffer = LOCAL_BUF.get();
-            int decompressedlength = inflater.inflate(decompressionbuffer);
-            if (!inflater.finished()) {
-                throw new DecoderException(MessageFormat.format("Badly compressed packet - size is larger than protocol maximum of {0}", decompressionbuffer.length));
+            inflater.reset();
+            inflater.setInput(MiscSerializer.readAllBytes(in));
+            byte[] buf = new byte[inflater.getRemaining() << 1];
+            for (int ret; (ret = inflater.inflate(buf)) >= 1;) {
+                decompression.writeBytes(buf, 0, ret);
             }
-            ByteBuf uncompresseddata = Unpooled.wrappedBuffer(decompressionbuffer, 0, decompressedlength);
-            while (uncompresseddata.isReadable()) {
-                output.add(Unpooled.wrappedBuffer(MiscSerializer.readBytes(uncompresseddata, VarNumberSerializer.readVarInt(uncompresseddata))));
+            while (decompression.isReadable()) {
+                int length = VarNumberSerializer.readVarInt(decompression);
+                output.add(Unpooled.wrappedBuffer(MiscSerializer.readBytes(decompression, length)));
             }
         } finally {
-            inflater.reset();
+            decompression.release();
         }
     }
 
