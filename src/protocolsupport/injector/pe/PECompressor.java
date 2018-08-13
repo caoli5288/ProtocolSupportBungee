@@ -4,21 +4,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
-import protocolsupport.utils.netty.Allocator;
 import protocolsupport.utils.netty.Compressor;
 
 public class PECompressor extends MessageToByteEncoder<ByteBuf> {
 
     private final int threshold;
-    private final Compressor fast = Compressor.create(3);
 
     public PECompressor(int threshold) {
+        super(false);
         this.threshold = Math.max(128, threshold);
     }
-
-    private final Compressor noop = Compressor.create(0);
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
@@ -27,11 +23,15 @@ public class PECompressor extends MessageToByteEncoder<ByteBuf> {
             int len = in.readableBytes();
             VarNumberSerializer.writeVarInt(buf, len);
             buf.writeBytes(in);
-            Compressor compressor = len < threshold ? noop : fast;
-            out.writeBytes(compressor.compress(MiscSerializer.readAllBytes(buf)));
+//            out.writeBytes(compressor.compress(MiscSerializer.readAllBytes(buf)));
+            Compressor.compressUnsafe(len <= threshold ? 0 : 1, buf, out);
         } finally {
             buf.release();
         }
     }
 
+    @Override
+    protected ByteBuf allocateBuffer(ChannelHandlerContext ctx, ByteBuf msg, boolean preferDirect) throws Exception {
+        return ctx.alloc().heapBuffer(msg.readableBytes() * 11 / 10 + 100);
+    }
 }

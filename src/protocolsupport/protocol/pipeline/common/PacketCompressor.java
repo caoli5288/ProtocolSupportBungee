@@ -14,7 +14,7 @@ public class PacketCompressor extends MessageToByteEncoder<ByteBuf> {
 
 	public PacketCompressor(int level, int threshold) {
 		this.threshold = threshold;
-		compressor = Compressor.create(level);
+		compressor = new Compressor(level);
 	}
 
 	@Override
