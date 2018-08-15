@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.protocol.Varint21LengthFieldPrepender;
 import protocolsupport.protocol.pipeline.common.EncapsulatedConnectionKeepAlive;
@@ -35,12 +36,7 @@ public class PEProxyServerConnection extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		clientconnection.write(msg).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-	}
-
-	@Override
-	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-		clientconnection.flush();
+		clientconnection.writeAndFlush(msg).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 	}
 
 	@Override
@@ -67,6 +63,7 @@ public class PEProxyServerConnection extends ChannelInboundHandlerAdapter {
 			protected void initChannel(Channel channel) throws Exception {
 				channel.pipeline()
 //				.addLast("ps-encap-hs-sender", new EncapsulatedHandshakeSender(remote, true))
+				.addLast("flush-consolidation", new FlushConsolidationHandler())
 				.addLast("ps-encap-hs-sender", new EncapsulatedHandshakeSender(remote, false))
 				.addLast("keepalive", new EncapsulatedConnectionKeepAlive())
 				.addLast("prepender", new Varint21LengthFieldPrepender())

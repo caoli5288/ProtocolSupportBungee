@@ -14,6 +14,8 @@ import protocolsupport.protocol.packet.middle.WriteableMiddlePacket;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.ClassMapMiddleTransformerRegistry;
 
+import java.util.Collection;
+
 public abstract class AbstractPacketEncoder extends MinecraftEncoder {
 
 	protected final ClassMapMiddleTransformerRegistry<DefinedPacket, WriteableMiddlePacket<?>> registry = new ClassMapMiddleTransformerRegistry<>();
@@ -55,7 +57,14 @@ public abstract class AbstractPacketEncoder extends MinecraftEncoder {
 	@Override
 	protected void encode(ChannelHandlerContext ctx, DefinedPacket msg, ByteBuf out) throws Exception {
 		WriteableMiddlePacket<DefinedPacket> transformer = (WriteableMiddlePacket<DefinedPacket>) registry.getTransformer(msg.getClass());
-		transformer.toData(msg).forEach(ctx::writeAndFlush);
+		Collection<ByteBuf> all = transformer.toData(msg);
+		if (all.isEmpty()) {
+			return;
+		}
+		for (ByteBuf buf : all) {
+			ctx.write(buf, ctx.voidPromise());
+		}
+		ctx.flush();
 	}
 
 }

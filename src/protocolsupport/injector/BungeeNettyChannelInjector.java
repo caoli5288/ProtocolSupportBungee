@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.ServerConnector;
 import net.md_5.bungee.UserConnection;
@@ -62,6 +63,7 @@ public class BungeeNettyChannelInjector extends Varint21LengthFieldPrepender {
 				ConnectionImpl connection = new ConnectionImpl(boss, initialhandler);
 				connection.storeInChannel(channel);
 				ProtocolStorage.addConnection(channel.remoteAddress(), connection);
+				pipeline.addBefore(PipelineUtils.BOSS_HANDLER, "flush-consolidation", new FlushConsolidationHandler());
 				pipeline.addBefore(PipelineUtils.BOSS_HANDLER, ChannelHandlers.LOGIC, new LogicHandler(connection));
 				pipeline.remove(PipelineUtils.LEGACY_DECODER);
 				pipeline.remove(PipelineUtils.LEGACY_KICKER);

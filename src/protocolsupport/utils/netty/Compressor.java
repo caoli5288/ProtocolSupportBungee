@@ -42,12 +42,11 @@ public class Compressor {
         try {
             handled.setInput(in.array(), in.arrayOffset() + in.readerIndex(), in.readableBytes());
             handled.finish();
-            int numBytes;
             do {
                 int writerIndex = out.writerIndex();
-                numBytes = handled.deflate(out.array(), out.arrayOffset() + writerIndex, out.writableBytes(), Deflater.SYNC_FLUSH);
+                int numBytes = handled.deflate(out.array(), out.arrayOffset() + writerIndex, out.writableBytes(), Deflater.SYNC_FLUSH);
                 out.writerIndex(writerIndex + numBytes);
-            } while (!handled.needsInput() || numBytes > 0);
+            } while (!handled.finished());
             in.readerIndex(in.readerIndex() + in.readableBytes());// new read index at last
         } finally {
             handled.recycle();
@@ -69,6 +68,7 @@ public class Compressor {
 
     private static class Handled {
 
+        private static final byte[] EMPTY_ARRAY = new byte[0];
         private final Recycler.Handle<Handled> handle;
         @Delegate
         private final Deflater deflater;
@@ -80,6 +80,7 @@ public class Compressor {
 
         private void recycle() {
             deflater.reset();
+            deflater.setInput(EMPTY_ARRAY);
             handle.recycle(this);
         }
     }
