@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.Recycler;
 import lombok.experimental.Delegate;
-import protocolsupport.protocol.serializer.MiscSerializer;
 
 import java.util.Arrays;
 import java.util.zip.Deflater;
@@ -25,29 +24,17 @@ public class Compressor {
         this.level = level;
     }
 
-    public void compress(ByteBuf in, ByteBuf out) {
-        if (in.hasArray() && out.hasArray()) {
-            if (out.writableBytes() < (in.readableBytes() * 11 / 10 + 50)) {
-                throw new EncoderException("compress");
-            }
-            compressUnsafe(level, in, out);
-        } else {
-            byte[] inArray = MiscSerializer.readAllBytes(in);
-            out.writeBytes(compress(inArray));
-        }
-    }
-
     public static void compressUnsafe(int level, ByteBuf in, ByteBuf out) {
         Handled handled = HANDLER_BY_LEVEL[level].get();
         try {
             handled.setInput(in.array(), in.arrayOffset() + in.readerIndex(), in.readableBytes());
             handled.finish();
             do {
-                int writerIndex = out.writerIndex();
-                int numBytes = handled.deflate(out.array(), out.arrayOffset() + writerIndex, out.writableBytes(), Deflater.SYNC_FLUSH);
-                out.writerIndex(writerIndex + numBytes);
-            } while (!handled.finished());
-            in.readerIndex(in.readerIndex() + in.readableBytes());// new read index at last
+                int index = out.writerIndex();
+                int len = handled.deflate(out.array(), out.arrayOffset() + index, out.writableBytes(), Deflater.SYNC_FLUSH);
+                out.writerIndex(index + len);
+            } while (!handled.finished() && out.isWritable());
+            in.readerIndex(in.readerIndex() + handled.getTotalIn());// new read index at end of compression
         } finally {
             handled.recycle();
         }
@@ -58,7 +45,7 @@ public class Compressor {
         try {
             handled.setInput(input);
             handled.finish();
-            byte[] compressed = new byte[((input.length * 11) / 10) + 50];
+            byte[] compressed = new byte[((input.length * 11) / 10) + 100];
             int len = handled.deflate(compressed);
             return Arrays.copyOf(compressed, len);
         } finally {
