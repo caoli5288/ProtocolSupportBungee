@@ -40,7 +40,7 @@ public class CommandRequestPacket extends PEDefinedReadableMiddlePacket {
 		// Command Origin Data
 		int type = VarNumberSerializer.readVarInt(from); // type
 		MiscSerializer.readUUIDLE(from); // UUID
-		StringSerializer.readVarIntUTF8String(from); // request ID
+		MiscSerializer.nullVarArray(from); // request ID
 		if ((type == ORIGIN_DEV_CONSOLE) || (type == ORIGIN_TEST)) {
 			VarNumberSerializer.readSVarLong(from); // ???
 		}

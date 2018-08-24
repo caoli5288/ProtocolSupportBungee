@@ -67,16 +67,16 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
             UUID read(ByteBuf buf) {
                 UUID id = MiscSerializer.readUUIDLE(buf);
                 VarNumberSerializer.readVarInt(buf);// Entity id
-                StringSerializer.readVarIntUTF8String(buf);// name
-                StringSerializer.readVarIntUTF8String(buf);// 3rd party
+                MiscSerializer.nullVarArray(buf);// name
+                MiscSerializer.nullVarArray(buf);// 3rd party
                 VarInt.readVarInt(buf);
-                StringSerializer.readVarIntUTF8String(buf);
-                StringSerializer.readVarIntUTF8String(buf);
-                StringSerializer.readVarIntUTF8String(buf);
-                StringSerializer.readVarIntUTF8String(buf);
-                StringSerializer.readVarIntUTF8String(buf);
-                StringSerializer.readVarIntUTF8String(buf);// x-uid
-                StringSerializer.readVarIntUTF8String(buf);// platform chat id
+                MiscSerializer.nullVarArray(buf);
+                MiscSerializer.nullVarArray(buf);
+                MiscSerializer.nullVarArray(buf);
+                MiscSerializer.nullVarArray(buf);
+                MiscSerializer.nullVarArray(buf);
+                MiscSerializer.nullVarArray(buf);// x-uid
+                MiscSerializer.nullVarArray(buf);// platform chat id
                 return id;
             }
         },

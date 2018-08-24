@@ -10,6 +10,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Chat;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
+import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
 
 public class FromServerChatPacket extends PEDefinedReadableMiddlePacket {
@@ -28,8 +29,8 @@ public class FromServerChatPacket extends PEDefinedReadableMiddlePacket {
 		type = (byte) (from.readUnsignedByte() == 5 ? 2 : 0);
 		from.readBoolean(); //needs translation
 		message = ComponentSerializer.toString(new TextComponent(StringSerializer.readVarIntUTF8String(from)));
-		StringSerializer.readVarIntUTF8String(from); //Xbox user ID
-		StringSerializer.readVarIntUTF8String(from); //Platform Chat ID
+		MiscSerializer.nullVarArray(from); //Xbox user ID
+		MiscSerializer.nullVarArray(from); //Platform Chat ID
 	}
 
 	@Override

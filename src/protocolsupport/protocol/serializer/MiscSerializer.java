@@ -50,4 +50,8 @@ public class MiscSerializer {
 		}
 	}
 
+	public static void nullVarArray(ByteBuf buf) {
+		buf.skipBytes(VarNumberSerializer.readVarInt(buf));
+	}
+
 }

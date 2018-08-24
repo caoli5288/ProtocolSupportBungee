@@ -11,6 +11,7 @@ import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Chat;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
+import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 
@@ -31,12 +32,12 @@ public class FromClientChatPacket extends PEDefinedReadableMiddlePacket {
 		int type = from.readUnsignedByte();
 		Validate.isTrue(type == CLIENT_CHAT_TYPE, MessageFormat.format("Unexcepted serverbound chat type, expected {0}, but received {1}", CLIENT_CHAT_TYPE, type));
 		from.readBoolean(); //needs translation
-		StringSerializer.readVarIntUTF8String(from); //skip sender
-		StringSerializer.readVarIntUTF8String(from); //skip third party name
+		MiscSerializer.nullVarArray(from); //skip sender
+		MiscSerializer.nullVarArray(from); //skip third party name
 		VarNumberSerializer.readSVarInt(from); //skip source platform
 		message = StringSerializer.readVarIntUTF8String(from);
-		StringSerializer.readVarIntUTF8String(from); //skip Xbox user ID
-		StringSerializer.readVarIntUTF8String(from); //skip platform chat ID
+		MiscSerializer.nullVarArray(from); //skip Xbox user ID
+		MiscSerializer.nullVarArray(from); //skip platform chat ID
 	}
 
 	@Override
