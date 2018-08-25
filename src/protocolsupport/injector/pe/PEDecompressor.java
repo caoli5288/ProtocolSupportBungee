@@ -51,6 +51,7 @@ public class PEDecompressor extends MessageToMessageDecoder<ByteBuf> {
     private void _input(ByteBuf in) {
         if (in.hasArray()) {
             decompress.setInput(in.array(), in.arrayOffset() + in.readerIndex(), in.readableBytes());
+            in.skipBytes(in.readableBytes());
             return;
         }
         decompress.setInput(MiscSerializer.readAllBytes(in));
