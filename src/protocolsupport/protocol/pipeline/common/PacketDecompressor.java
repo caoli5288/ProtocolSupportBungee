@@ -27,7 +27,8 @@ public class PacketDecompressor extends ByteToMessageDecoder {
 	protected void decode(ChannelHandlerContext ctx, ByteBuf from, List<Object> list) throws DataFormatException {
 		int uncompressed = VarNumberSerializer.readVarInt(from);
 		if (uncompressed == 0) {
-			list.add(from.retain());
+			list.add(from.retainedSlice());
+			from.skipBytes(from.readableBytes());
 		} else {
 			if (uncompressed > MAX_PACKET_LENGTH) {
 				throw new DecoderException(MessageFormat.format("Badly compressed packet - size of {0} is larger than protocol maximum of {1}", uncompressed, MAX_PACKET_LENGTH));
