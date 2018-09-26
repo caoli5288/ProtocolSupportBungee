@@ -5,8 +5,8 @@ import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
+import protocolsupport.protocol.packet.wrapper.WrappedPlayerListItem;
 import protocolsupport.protocol.serializer.MiscSerializer;
-import protocolsupport.protocol.serializer.StringSerializer;
 import protocolsupport.protocol.serializer.VarInt;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 
@@ -43,23 +43,15 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
 
     @Override
     public Collection<PacketWrapper> toNative() {
-        PlayerListItem pk = tonative();
-        ByteBuf buf = Unpooled.wrappedBuffer(readbytes);
-        if (action == Action.ADD_PLAYER) {
-            cache.getLastTabList().add(buf);
-        }
-        return Collections.singletonList(new PacketWrapper(pk, Unpooled.EMPTY_BUFFER));
-    }
-
-    private PlayerListItem tonative() {
-        PlayerListItem item = new PlayerListItem();
+        WrappedPlayerListItem item = new WrappedPlayerListItem();
+        item.setOrigin(Unpooled.wrappedBuffer(readbytes));
         item.setAction(action.origin);
         item.setItems(elementlist.stream().map(el -> {
             PlayerListItem.Item i = new PlayerListItem.Item();
             i.setUuid(el);
             return i;
         }).toArray(PlayerListItem.Item[]::new));
-        return item;
+        return Collections.singletonList(new PacketWrapper(item, Unpooled.EMPTY_BUFFER));
     }
 
     enum Action {

@@ -58,12 +58,6 @@ public class NetworkDataCache {
 		return peClientUUID;
 	}
 
-	private final Queue<ByteBuf> lastTabList = new LinkedList<>();
-
-	public Queue<ByteBuf> getLastTabList() {
-		return lastTabList;
-	}
-
 	private final TLongHashSet watchedEntities = new TLongHashSet(1 << 10);
 
 	public TLongHashSet getWatchedEntities() {

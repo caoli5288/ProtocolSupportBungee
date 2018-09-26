@@ -3,6 +3,7 @@ package protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import protocolsupport.protocol.packet.middle.WriteableMiddlePacket;
+import protocolsupport.protocol.packet.wrapper.IWrappedPacket;
 import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.utils.netty.Allocator;
@@ -10,19 +11,17 @@ import protocolsupport.utils.netty.Allocator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 
 public class PlayerListItemPacket extends WriteableMiddlePacket<PlayerListItem> {
 
     @Override
     public Collection<ByteBuf> toData(PlayerListItem packet) {
-        List<ByteBuf> output = new ArrayList<>();
-        Queue<ByteBuf> lastTabList = cache.getLastTabList();
-        if (!lastTabList.isEmpty()) {
-            output.addAll(lastTabList);
-            lastTabList.clear();
+        if (packet instanceof IWrappedPacket) {
+            return Collections.singleton(((IWrappedPacket) packet).origin());
         }
+        List<ByteBuf> output = new ArrayList<>();
         if (packet.getAction() == PlayerListItem.Action.REMOVE_PLAYER) {
             output.add(remove(packet.getItems()));
         }
