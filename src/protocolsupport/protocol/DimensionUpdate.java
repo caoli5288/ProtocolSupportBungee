@@ -19,6 +19,9 @@ public class DimensionUpdate implements Listener {
     @EventHandler
     public void handle(ServerPostConnectedEvent event) {
         ConnectionImpl connection = (ConnectionImpl) ProtocolSupportAPI.getConnection(event.getPlayer());
+        if (connection == null) {// ?Already disconnected
+            return;
+        }
         NetworkDataCache cache = NetworkDataCache.getFrom(connection);
         if (cache == null || !cache.dimQueue()) {
             return;
