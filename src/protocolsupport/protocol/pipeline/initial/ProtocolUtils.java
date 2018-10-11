@@ -41,9 +41,10 @@ public class ProtocolUtils {
 	}
 
 	protected static ProtocolVersion readPEHandshake(ByteBuf data) {
-		data.readByte();
-		data.readByte();
 		int incomingversion = data.readInt();
+		if (incomingversion == 0) {
+			incomingversion = data.readShort();
+		}
 		ProtocolVersion version = ProtocolVersion.fromId(incomingversion);
 		if (version == ProtocolVersion.UNKNOWN) {
 			if (incomingversion > ProtocolVersion.getLatest(ProtocolType.PE).getId()) {
