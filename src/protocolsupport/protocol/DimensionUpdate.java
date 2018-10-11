@@ -7,6 +7,7 @@ import net.md_5.bungee.api.event.ServerPostConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.PacketWrapper;
+import protocolsupport.ProtocolSupport;
 import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.injector.BungeeNettyChannelInjector;
 import protocolsupport.protocol.storage.NetworkDataCache;
@@ -26,22 +27,28 @@ public class DimensionUpdate implements Listener {
         if (cache == null || !cache.dimQueue()) {
             return;
         }
-        Runnable origin = event.getRunnable();
-        event.setRunnable(() -> writeAndWait(connection, cache, cache.dimUpdate(), origin));
+        event.registerIntent(ProtocolSupport.get());
+        invoke(event, cache, (UserConnection) event.getPlayer());
     }
 
-    private void writeAndWait(ConnectionImpl connection, NetworkDataCache cache, RecyclableArrayList update, Runnable origin) {
-        UserConnection user = (UserConnection) connection.getPlayer();
-        for (ByteBuf buf : (List<ByteBuf>) (List) update) {
-            user.sendPacket(new PacketWrapper(null, buf));
+    private void invoke(ServerPostConnectedEvent event, NetworkDataCache cache, UserConnection user) {
+        RecyclableArrayList queue = cache.dimUpdate();
+        boolean ret = false;
+        try {
+            for (Object obj : queue) {
+                user.sendPacket(new PacketWrapper(null, (ByteBuf) obj));
+            }
+            ret = true;
+        } catch (Exception err) {// disconnected?
+            System.out.println("!!! Error in dimension update invoke. " + err.getMessage());
+        } finally {
+            queue.recycle();
         }
-        update.recycle();
-
-        if (!cache.dimQueue()) {
-            origin.run();
-            return;
+        if (ret && cache.dimQueue() && user.isActive()) {
+            event.getConnector().eventLoop().schedule(() -> invoke(event, cache, user), 500, TimeUnit.MILLISECONDS);
+        } else {
+            event.completeIntent(ProtocolSupport.get());
         }
-
-        ((BungeeNettyChannelInjector.CustomHandlerBoss) connection.getNetworkManager()).getChannel().eventLoop().schedule(() -> writeAndWait(connection, cache, cache.dimUpdate(), origin), 500, TimeUnit.MILLISECONDS);
     }
+
 }

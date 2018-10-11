@@ -30,9 +30,15 @@ public class ProtocolSupport extends Plugin implements Listener {
     private PEProxyServer peserver;
     @Getter
     private static String x19Auth = "http://x19authserver.nie.netease.com/check";
+    private static ProtocolSupport instance;
+
+    public static ProtocolSupport get() {
+        return instance;
+    }
 
     @SneakyThrows
     public void onLoad() {
+        instance = this;
         try {
             getProxy().getPluginManager().registerCommand(this, new CommandHandler());
             BungeeNettyChannelInjector.inject();
