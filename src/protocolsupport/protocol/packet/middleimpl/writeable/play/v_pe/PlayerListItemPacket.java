@@ -2,9 +2,11 @@ package protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe;
 
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.packet.middle.WriteableMiddlePacket;
 import protocolsupport.protocol.packet.wrapper.IWrappedPacket;
 import protocolsupport.protocol.serializer.MiscSerializer;
+import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.utils.netty.Allocator;
 
@@ -23,16 +25,14 @@ public class PlayerListItemPacket extends WriteableMiddlePacket<PlayerListItem> 
         }
         List<ByteBuf> output = new ArrayList<>();
         if (packet.getAction() == PlayerListItem.Action.REMOVE_PLAYER) {
-            output.add(remove(packet.getItems()));
+            output.add(remove(connection.getVersion(), packet.getItems()));
         }
         return output;
     }
 
-    public static ByteBuf remove(PlayerListItem.Item[] input) {
+    public static ByteBuf remove(ProtocolVersion version, PlayerListItem.Item[] input) {
         ByteBuf pk = Allocator.allocateBuffer();
-        VarNumberSerializer.writeVarInt(pk, 63);
-        pk.writeByte(0);
-        pk.writeByte(0);
+        PEPacketIdSerializer.writePacketId(version, pk, 63);
         pk.writeByte(1);// action remove
         VarNumberSerializer.writeVarInt(pk, input.length);
         Arrays.asList(input).forEach(ele -> MiscSerializer.writeUUIDLE(pk, ele.getUuid()));

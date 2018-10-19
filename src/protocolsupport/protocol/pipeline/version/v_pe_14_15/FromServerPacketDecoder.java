@@ -18,6 +18,7 @@ import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.KickP
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.LoginPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.PlayerListItemPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.RespawnPacket;
+import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;
@@ -72,10 +73,7 @@ public class FromServerPacketDecoder extends MinecraftDecoder {
 	}
 
 	protected int readPacketId(ByteBuf from) {
-		int id = VarNumberSerializer.readVarInt(from);
-		from.readByte();
-		from.readByte();
-		return id;
+		return PEPacketIdSerializer.readPacketId(connection.getVersion(), from);
 	}
 
 }

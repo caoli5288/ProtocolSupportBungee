@@ -9,6 +9,8 @@ import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
+import protocolsupport.api.ProtocolType;
+import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
 import protocolsupport.utils.PingSerializer;
@@ -44,7 +46,7 @@ public class PEProxyServerInfoHandler implements PingHandler {
 		}
 		try {
 			ByteBuf request = Unpooled.buffer();
-			PEPacketIdSerializer.writePacketId(request, PACKET_ID);
+			PEPacketIdSerializer.writePacketId(ProtocolVersion.MINECRAFT_PE, request, PACKET_ID);
 			PingResponseInterceptor interceptor = new PingResponseInterceptor();
 			channel.pipeline().addBefore(PEProxyNetworkManager.NAME, "peproxy-serverinfo", interceptor);
 			channel.pipeline().context(interceptor).fireChannelRead(request);
@@ -76,7 +78,7 @@ public class PEProxyServerInfoHandler implements PingHandler {
 		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 			try {
 				ByteBuf serverdata = (ByteBuf) msg;
-				if (PEPacketIdSerializer.readPacketId(serverdata) != PACKET_ID) {
+				if (PEPacketIdSerializer.readPacketId(ProtocolVersion.MINECRAFT_PE, serverdata) != PACKET_ID) {
 					throw new EncoderException("Unknown packet sent by server while handling internal pe ping passthrough");
 				}
 				response.put(PingSerializer.fromJson(StringSerializer.readVarIntUTF8String(serverdata)));

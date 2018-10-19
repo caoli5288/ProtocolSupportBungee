@@ -7,8 +7,11 @@ import java.util.UUID;
 
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.Login;
+import protocolsupport.api.ProtocolVersion;
+import protocolsupport.protocol.PEBlockPalette;
 import protocolsupport.protocol.packet.middle.WriteableMiddlePacket;
 import protocolsupport.protocol.serializer.MiscSerializer;
+import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.utils.netty.Allocator;
@@ -36,6 +39,7 @@ public class StartGamePacket extends WriteableMiddlePacket<Login> {
 
 	@Override
 	public Collection<ByteBuf> toData(Login packet) {
+		ProtocolVersion version = connection.getVersion();
 		ArrayList<ByteBuf> packets = new ArrayList<>();
 		ByteBuf resourcepack = Allocator.allocateBuffer();
 		writePacketId(resourcepack, 6);
@@ -89,6 +93,11 @@ public class StartGamePacket extends WriteableMiddlePacket<Login> {
 		startgame.writeBoolean(false); // can Platformbroadcast
 		VarNumberSerializer.writeVarInt(startgame, 0); //Broadcast mode
 		startgame.writeBoolean(false); //Broadcast intent
+		if (version.isAfterOrEq(ProtocolVersion.MINECRAFT_PE_1_5)) {
+			startgame.writeBoolean(false);
+			startgame.writeBoolean(false);
+			startgame.writeBoolean(false);
+		}
 		// END LEVEL SETTING
 		StringSerializer.writeVarIntUTF8String(startgame, levelId);
 		StringSerializer.writeVarIntUTF8String(startgame, ""); //level name (will packet.getLevelType() work?)
@@ -96,14 +105,15 @@ public class StartGamePacket extends WriteableMiddlePacket<Login> {
 		startgame.writeBoolean(false); //is trial
 		startgame.writeLong(0); //level time
 		VarNumberSerializer.writeSVarInt(startgame, 0); //enchantment seed
+		if (version.isAfterOrEq(ProtocolVersion.MINECRAFT_PE_1_6)) {
+			startgame.writeBytes(PEBlockPalette.getPaletteData());
+		}
 		packets.add(startgame);
 		return packets;
 	}
 
 	protected void writePacketId(ByteBuf data, int packetId) {
-		VarNumberSerializer.writeVarInt(data, packetId);
-		data.writeByte(0);
-		data.writeByte(0);
+		PEPacketIdSerializer.writePacketId(connection.getVersion(), data, packetId);
 	}
 
 }

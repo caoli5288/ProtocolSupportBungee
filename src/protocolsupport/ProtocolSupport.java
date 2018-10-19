@@ -14,6 +14,7 @@ import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.injector.BungeeNettyChannelInjector;
 import protocolsupport.injector.pe.PEProxyServer;
 import protocolsupport.protocol.DimensionUpdate;
+import protocolsupport.protocol.PEBlockPalette;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,6 +82,8 @@ public class ProtocolSupport extends Plugin implements Listener {
         }
 
         (peserver = new PEProxyServer(listen == null ? getProxy().getConfig().getListeners().iterator().next().getHost() : toInetAddr(listen))).start();
+
+        PEBlockPalette.getPaletteData();
     }
 
     private InetSocketAddress toInetAddr(String listen) {

@@ -58,7 +58,7 @@ public class FromClientPacketDecoder extends MinecraftDecoder {
 			return;
 		}
 		buf.markReaderIndex();
-		ReadableMiddlePacket transformer = registry.getTransformer(protocol, PEPacketIdSerializer.readPacketId(buf), false);
+		ReadableMiddlePacket transformer = registry.getTransformer(protocol, PEPacketIdSerializer.readPacketId(connection.getVersion(), buf), false);
 		if (transformer == null) {
 			buf.resetReaderIndex();
 			packets.add(new PacketWrapper(null, buf.copy()));

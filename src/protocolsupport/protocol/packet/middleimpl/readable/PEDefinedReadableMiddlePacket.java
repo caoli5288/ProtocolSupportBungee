@@ -1,7 +1,7 @@
 package protocolsupport.protocol.packet.middleimpl.readable;
 
 import io.netty.buffer.ByteBuf;
-import protocolsupport.protocol.serializer.VarNumberSerializer;
+import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 
 public abstract class PEDefinedReadableMiddlePacket extends DefinedReadableMiddlePacket {
 
@@ -11,9 +11,7 @@ public abstract class PEDefinedReadableMiddlePacket extends DefinedReadableMiddl
 
 	@Override
 	protected void writePacketId(ByteBuf to) {
-		VarNumberSerializer.writeVarInt(to, packetId);
-		to.writeByte(0);
-		to.writeByte(0);
+		PEPacketIdSerializer.writePacketId(connection.getVersion(), to, packetId);
 	}
 
 }
