@@ -45,7 +45,7 @@ public class DimensionUpdate implements Listener {
             queue.recycle();
         }
         if (ret && cache.dimQueue() && user.isActive()) {
-            event.getConnector().eventLoop().schedule(() -> invoke(event, cache, user), 500, TimeUnit.MILLISECONDS);
+            event.getConnector().eventLoop().schedule(() -> invoke(event, cache, user), 1, TimeUnit.SECONDS);
         } else {
             event.completeIntent(ProtocolSupport.get());
         }
