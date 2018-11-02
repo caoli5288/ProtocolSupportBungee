@@ -4,16 +4,12 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.event.EventHandler;
 import org.yaml.snakeyaml.Yaml;
-import protocolsupport.api.Connection;
-import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.injector.BungeeNettyChannelInjector;
 import protocolsupport.injector.pe.PEProxyServer;
-import protocolsupport.protocol.DimensionUpdate;
+import protocolsupport.protocol.PEServerSwitchListener;
 import protocolsupport.protocol.PEBlockPalette;
 
 import java.io.File;
@@ -52,7 +48,7 @@ public class ProtocolSupport extends Plugin implements Listener {
     @SneakyThrows
     public void onEnable() {
         getProxy().getPluginManager().registerListener(this, this);
-        getProxy().getPluginManager().registerListener(this, new DimensionUpdate());
+        getProxy().getPluginManager().registerListener(this, new PEServerSwitchListener());
 
         File dataFolder = getDataFolder();
         if (!dataFolder.isDirectory() && dataFolder.mkdir()) {
@@ -89,14 +85,6 @@ public class ProtocolSupport extends Plugin implements Listener {
     private InetSocketAddress toInetAddr(String listen) {
         Iterator<String> itr = Arrays.asList(listen.split(":")).iterator();
         return new InetSocketAddress(itr.next(), itr.hasNext() ? Integer.valueOf(itr.next()) : 19132);
-    }
-
-    @EventHandler
-    public void handle(ServerSwitchEvent event) {
-        Connection conn = ProtocolSupportAPI.getConnection(event.getPlayer());
-        if (conn.getMetadata("_PE_TRANSFER_") == null) {
-            conn.addMetadata("_PE_TRANSFER_", "");
-        }
     }
 
     @Override

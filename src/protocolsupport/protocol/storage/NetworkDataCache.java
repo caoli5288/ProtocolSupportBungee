@@ -1,26 +1,17 @@
 package protocolsupport.protocol.storage;
 
 import gnu.trove.set.hash.TLongHashSet;
-import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.RecyclableArrayList;
 import net.md_5.bungee.protocol.packet.Handshake;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
 import org.apache.commons.lang3.Validate;
 import protocolsupport.api.Connection;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
 import java.util.UUID;
 
 public class NetworkDataCache {
 
 	private static final String METADATA_KEY = "__PSB_NDC";
-
-	public static NetworkDataCache getFrom(Connection connection) {
-		return (NetworkDataCache) connection.getMetadata(METADATA_KEY);
-	}
 
 	public void storeIn(Connection connection) {
 		connection.addMetadata(METADATA_KEY, this);
@@ -92,4 +83,23 @@ public class NetworkDataCache {
 		return (yFakeFlag = !yFakeFlag) ? 20 : 30;
 	}
 
+	private boolean awaitDimensionAck;
+
+	public boolean isAwaitDimensionAck() {
+		return awaitDimensionAck;
+	}
+
+	public void setAwaitDimensionAck(boolean awaitDimensionAck) {
+		this.awaitDimensionAck = awaitDimensionAck;
+	}
+
+	private LinkedTokenBasedThrottler<Long> entityKillThrottler = new LinkedTokenBasedThrottler<>(0x40);
+
+	public LinkedTokenBasedThrottler<Long> getEntityKillThrottler() {
+		return entityKillThrottler;
+	}
+
+	public static NetworkDataCache getFrom(Connection connection) {
+		return (NetworkDataCache) connection.getMetadata(METADATA_KEY);
+	}
 }

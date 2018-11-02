@@ -19,7 +19,6 @@ import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.Login
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.PlayerListItemPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.RespawnPacket;
 import protocolsupport.protocol.serializer.PEPacketIdSerializer;
-import protocolsupport.protocol.serializer.VarNumberSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;
 
@@ -62,7 +61,7 @@ public class FromServerPacketDecoder extends MinecraftDecoder {
 		ReadableMiddlePacket transformer = registry.getTransformer(Protocol.GAME, readPacketId(buf), false);
 		if (transformer == null) {
 			buf.resetReaderIndex();
-			packets.add(new PacketWrapper(null, buf.copy()));
+			packets.add(new PacketWrapper(null, buf.retain()));
 		} else {
 			transformer.read(buf);
 			if (buf.isReadable()) {

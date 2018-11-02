@@ -15,6 +15,7 @@ import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.LoginH
 import protocolsupport.protocol.packet.middleimpl.readable.handshake.v_pe.PingHandshakePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.CommandRequestPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromClientChatPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromClientPlayerActionPacket;
 import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.protocol.utils.registry.PacketIdMiddleTransformerRegistry;
@@ -29,6 +30,7 @@ public class FromClientPacketDecoder extends MinecraftDecoder {
 		registry.register(Protocol.HANDSHAKE, PEProxyServerInfoHandler.PACKET_ID, PingHandshakePacket.class);
 		registry.register(Protocol.GAME, FromClientChatPacket.PACKET_ID, FromClientChatPacket.class);
 		registry.register(Protocol.GAME, CommandRequestPacket.PACKET_ID, CommandRequestPacket.class);
+		registry.register(Protocol.GAME, FromClientPlayerActionPacket.PACKET_ID, FromClientPlayerActionPacket.class);
 	}
 
 	protected final Connection connection;
@@ -61,7 +63,7 @@ public class FromClientPacketDecoder extends MinecraftDecoder {
 		ReadableMiddlePacket transformer = registry.getTransformer(protocol, PEPacketIdSerializer.readPacketId(connection.getVersion(), buf), false);
 		if (transformer == null) {
 			buf.resetReaderIndex();
-			packets.add(new PacketWrapper(null, buf.copy()));
+			packets.add(new PacketWrapper(null, buf.retain()));
 		} else {
 			transformer.read(buf);
 			if (buf.isReadable()) {

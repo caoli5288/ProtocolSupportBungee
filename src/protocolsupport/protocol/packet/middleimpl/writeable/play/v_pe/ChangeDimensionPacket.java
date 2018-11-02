@@ -1,7 +1,6 @@
 package protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe;
 
 import gnu.trove.iterator.TLongIterator;
-import gnu.trove.set.hash.TLongHashSet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.internal.RecyclableArrayList;
@@ -14,36 +13,38 @@ import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.serializer.VarInt;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
+import protocolsupport.protocol.storage.LinkedTokenBasedThrottler;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.utils.netty.Allocator;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
 
     @Override
     public Collection<ByteBuf> toData(Respawn packet) {
-        ProtocolVersion version = connection.getVersion();
-        List<ByteBuf> sendque = new ArrayList<>(0xFF);
-        removeEntities(version, sendque, cache);
+        if (!cache.isAwaitDimensionAck()) cache.setAwaitDimensionAck(true);
 
-        RecyclableArrayList dimque = RecyclableArrayList.newInstance();
-        /*
-         * yzh update
-         */
+        LinkedTokenBasedThrottler<Long> throttler = cache.getEntityKillThrottler();
+        TLongIterator iterator = cache.getWatchedEntities().iterator();
+        while (iterator.hasNext()) throttler.add(iterator.next());
+        cache.getWatchedEntities().clear();
+
+        RecyclableArrayList queue = RecyclableArrayList.newInstance();
         if (cache.dimQueue()) {
-            dimque.add(createPlayStatus(3));// dim status
+            queue.add(createPlayStatus(3));// dim status
         }
 
-        dimque.add(createDimChange(version, packet.getDimension()));// dim change
-        addFakeChunk(version, dimque);// chunk
-        dimque.add(createPosition(version, cache));// position
+        ProtocolVersion version = connection.getVersion();
 
-        cache.dimUpdate(dimque);
+        queue.add(createDimChange(version, packet.getDimension()));// dim change
+        addFakeChunk(version, queue);// chunk
+        queue.add(createPosition(version, cache));// position
 
-        return sendque;
+        cache.dimUpdate(queue);
+
+        return Collections.emptyList();
     }
 
     public static ByteBuf createDimChange(ProtocolVersion version, int dim) {
@@ -108,16 +109,11 @@ public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
         return serializer;
     }
 
-    private static void removeEntities(ProtocolVersion version, List<ByteBuf> sendque, NetworkDataCache cache) {
-        TLongHashSet watchedEntities = cache.getWatchedEntities();
-        TLongIterator itr = watchedEntities.iterator();
-        while (itr.hasNext()) {
-            ByteBuf buf = Allocator.allocateBuffer();
-            PEPacketIdSerializer.writePacketId(version, buf, 14);
-            VarInt.writeVarLong(buf, itr.next());
-            sendque.add(buf);
-        }
-        watchedEntities.clear();
+    public static ByteBuf createEntityRemove(ProtocolVersion version, long id) {
+        ByteBuf buf = Allocator.allocateBuffer();
+        PEPacketIdSerializer.writePacketId(version, buf, 14);
+        VarInt.writeVarLong(buf, id);
+        return buf;
     }
 
 }
