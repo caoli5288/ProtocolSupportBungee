@@ -54,6 +54,9 @@ public class PEServerSwitchListener implements Listener {
     }
 
     private static void throttledEntityKill(Connection connection, NetworkDataCache cache) {
+        if (!connection.isConnected()) {
+            return;
+        }
         if (cache.isAwaitSpawn()) {
             ProxyServer.getInstance().getScheduler().schedule(ProtocolSupport.get(), () -> throttledEntityKill(connection, cache), 1, TimeUnit.SECONDS);
             return;
