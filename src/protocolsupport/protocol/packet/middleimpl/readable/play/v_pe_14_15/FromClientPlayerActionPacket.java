@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.PacketWrapper;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
+import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.ChangeDimensionPacket;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
 
 import java.util.Collection;
@@ -48,13 +49,14 @@ public class FromClientPlayerActionPacket extends PEDefinedReadableMiddlePacket 
     protected void read0(ByteBuf from) {
         VarNumberSerializer.readVarLong(from);// ENTITY ID
         int action = VarNumberSerializer.readSVarInt(from);
-        System.out.println("action id " + action);
+//        System.out.println("action id " + action);
         switch (action) {
             case SPAWNED: {
-                if (cache.isAwaitDimensionAck()) cache.setAwaitDimensionAck(false);
+                cache.setAwaitSpawn(false, true);
                 break;
             }
             case DIMENSION_CHANGE_ACK: {
+                ChangeDimensionPacket.onAckReceive(connection, cache);
                 break;
             }
         }

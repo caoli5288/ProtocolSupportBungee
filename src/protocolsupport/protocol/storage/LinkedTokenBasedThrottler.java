@@ -64,12 +64,7 @@ public class LinkedTokenBasedThrottler<T> {
     }
 
     public boolean remove(T id) {
-        int index = buf.indexOf(id);
-        if (index != -1) {
-            buf.remove(index);
-            return true;
-        }
-        return false;
+        return buf.remove(id);
     }
 
     public void add(T id) {

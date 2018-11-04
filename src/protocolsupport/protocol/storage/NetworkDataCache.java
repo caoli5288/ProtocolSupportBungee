@@ -1,8 +1,9 @@
 package protocolsupport.protocol.storage;
 
 import gnu.trove.set.hash.TLongHashSet;
-import io.netty.util.internal.RecyclableArrayList;
+import net.md_5.bungee.api.event.ServerPostConnectedEvent;
 import net.md_5.bungee.protocol.packet.Handshake;
+import net.md_5.bungee.protocol.packet.Respawn;
 import org.apache.commons.lang3.Validate;
 import protocolsupport.api.Connection;
 
@@ -63,20 +64,6 @@ public class NetworkDataCache {
 		watchedEntities.remove(id);
 	}
 
-	private LinkedList<RecyclableArrayList> dimUpdateQueue = new LinkedList<>();
-
-	public void dimUpdate(RecyclableArrayList list) {
-		dimUpdateQueue.add(list);
-	}
-
-	public RecyclableArrayList dimUpdate() {
-		return dimUpdateQueue.poll();
-	}
-
-	public boolean dimQueue() {
-		return !dimUpdateQueue.isEmpty();
-	}
-
 	private boolean yFakeFlag;
 
 	public int updateFakeY() {
@@ -89,17 +76,50 @@ public class NetworkDataCache {
 		return awaitDimensionAck;
 	}
 
-	public void setAwaitDimensionAck(boolean awaitDimensionAck) {
-		this.awaitDimensionAck = awaitDimensionAck;
+	public boolean setAwaitDimensionAck(boolean to, boolean from) {
+		if (awaitDimensionAck == from) {
+			awaitDimensionAck = to;
+			return true;
+		}
+		return false;
 	}
 
-	private LinkedTokenBasedThrottler<Long> entityKillThrottler = new LinkedTokenBasedThrottler<>(0x40);
+	private final LinkedTokenBasedThrottler<Long> entityKillThrottler = new LinkedTokenBasedThrottler<>(0x40);
 
 	public LinkedTokenBasedThrottler<Long> getEntityKillThrottler() {
 		return entityKillThrottler;
 	}
 
+	private ServerPostConnectedEvent postConnector;
+
+	public ServerPostConnectedEvent getPostConnector() {
+		return postConnector;
+	}
+
+	public void setPostConnector(ServerPostConnectedEvent postConnector) {
+		this.postConnector = postConnector;
+	}
+
+	private final LinkedList<Respawn> changeDimensionQueue = new LinkedList<>();
+
+	public LinkedList<Respawn> getChangeDimensionQueue() {
+		return changeDimensionQueue;
+	}
+
 	public static NetworkDataCache getFrom(Connection connection) {
 		return (NetworkDataCache) connection.getMetadata(METADATA_KEY);
 	}
+
+	private boolean awaitSpawn;
+
+	public boolean isAwaitSpawn() {
+		return awaitSpawn;
+	}
+
+	public void setAwaitSpawn(boolean to, boolean from) {
+		if (awaitSpawn == from) {
+			awaitSpawn = to;
+		}
+	}
+
 }

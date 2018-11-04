@@ -1,7 +1,5 @@
 package protocolsupport.protocol;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.util.internal.RecyclableArrayList;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.ServerPostConnectedEvent;
@@ -14,7 +12,7 @@ import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.api.ProtocolType;
 import protocolsupport.api.ProtocolVersion;
-import protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe.ChangeDimensionPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerEntityRemovePacket;
 import protocolsupport.protocol.storage.LinkedTokenBasedThrottler;
 import protocolsupport.protocol.storage.NetworkDataCache;
 
@@ -29,11 +27,12 @@ public class PEServerSwitchListener implements Listener {
             return;
         }
         NetworkDataCache cache = NetworkDataCache.getFrom(connection);
-        if (cache == null || !cache.dimQueue()) {
+        if (cache == null || !cache.isAwaitDimensionAck()) {
             return;
         }
+//        System.out.println("cache.isAwaitDimensionAck");
         event.registerIntent(ProtocolSupport.get());
-        invoke(event, cache, (UserConnection) event.getPlayer());
+        cache.setPostConnector(event);
     }
 
     @EventHandler
@@ -55,7 +54,7 @@ public class PEServerSwitchListener implements Listener {
     }
 
     private static void throttledEntityKill(Connection connection, NetworkDataCache cache) {
-        if (cache.isAwaitDimensionAck()) {
+        if (cache.isAwaitSpawn()) {
             ProxyServer.getInstance().getScheduler().schedule(ProtocolSupport.get(), () -> throttledEntityKill(connection, cache), 1, TimeUnit.SECONDS);
             return;
         }
@@ -64,30 +63,10 @@ public class PEServerSwitchListener implements Listener {
         while (!throttler.isTokenOrObjEmpty()) {
             long id = throttler.useTokenAndObj();
             if (!cache.getWatchedEntities().contains(id)) {
-                ((UserConnection) connection.getPlayer()).sendPacket(new PacketWrapper(null, ChangeDimensionPacket.createEntityRemove(connection.getVersion(), id)));
+                ((UserConnection) connection.getPlayer()).sendPacket(new PacketWrapper(null, FromServerEntityRemovePacket.createEntityRemove(connection.getVersion(), id)));
             }
         }
         if (!throttler.isEmpty()) ProxyServer.getInstance().getScheduler().schedule(ProtocolSupport.get(), () -> throttledEntityKill(connection, cache), 1, TimeUnit.SECONDS);
-    }
-
-    private void invoke(ServerPostConnectedEvent event, NetworkDataCache cache, UserConnection user) {
-        RecyclableArrayList queue = cache.dimUpdate();
-        boolean ret = false;
-        try {
-            for (Object obj : queue) {
-                user.sendPacket(new PacketWrapper(null, (ByteBuf) obj));
-            }
-            ret = true;
-        } catch (Exception err) {// disconnected?
-            System.out.println("!!! Error in dimension update invoke. " + err.getMessage());
-        } finally {
-            queue.recycle();
-        }
-        if (ret && cache.dimQueue() && user.isActive()) {
-            event.getConnector().eventLoop().schedule(() -> invoke(event, cache, user), 1, TimeUnit.SECONDS);
-        } else {
-            event.completeIntent(ProtocolSupport.get());
-        }
     }
 
 }
