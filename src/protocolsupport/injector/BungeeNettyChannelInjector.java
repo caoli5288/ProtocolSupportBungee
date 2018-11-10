@@ -50,6 +50,9 @@ public class BungeeNettyChannelInjector extends Varint21LengthFieldPrepender {
 		protected void initChannel(Channel channel) throws Exception {
 			ChannelPipeline pipeline = channel.pipeline();
 			PacketHandler handler = ReflectionUtils.getFieldValue(pipeline.get(HandlerBoss.class), "handler");
+			if (handler == null) {// Maybe ping handler
+				return;
+			}
 			CustomHandlerBoss boss = new CustomHandlerBoss(handler);
 			pipeline.replace(PipelineUtils.BOSS_HANDLER, PipelineUtils.BOSS_HANDLER, boss);
 			if (handler instanceof InitialHandler) {//user to bungee connection
