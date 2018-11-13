@@ -11150,19 +11150,19 @@
    {
       "data" : 0,
       "id" : 210,
-      "name" : "minecraft:210",
+      "name" : "minecraft:barrier",
       "runtimeId" : 1858
    },
    {
       "data" : 0,
       "id" : 211,
-      "name" : "minecraft:211",
+      "name" : "minecraft:barrier",
       "runtimeId" : 1859
    },
    {
       "data" : 0,
       "id" : 212,
-      "name" : "minecraft:212",
+      "name" : "minecraft:barrier",
       "runtimeId" : 1860
    },
    {
@@ -11282,7 +11282,7 @@
    {
       "data" : 0,
       "id" : 217,
-      "name" : "minecraft:217",
+      "name" : "minecraft:barrier",
       "runtimeId" : 1880
    },
    {
@@ -11912,97 +11912,97 @@
    {
       "data" : 0,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1985
    },
    {
       "data" : 1,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1986
    },
    {
       "data" : 2,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1987
    },
    {
       "data" : 3,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1988
    },
    {
       "data" : 4,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1989
    },
    {
       "data" : 5,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1990
    },
    {
       "data" : 6,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1991
    },
    {
       "data" : 7,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1992
    },
    {
       "data" : 8,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1993
    },
    {
       "data" : 9,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1994
    },
    {
       "data" : 10,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1995
    },
    {
       "data" : 11,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1996
    },
    {
       "data" : 12,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1997
    },
    {
       "data" : 13,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1998
    },
    {
       "data" : 14,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 1999
    },
    {
       "data" : 15,
       "id" : 230,
-      "name" : "minecraft:mod_ore",
+      "name" : "minecraft:stained_glass",
       "runtimeId" : 2000
    },
    {
@@ -12686,7 +12686,7 @@
    {
       "data" : 0,
       "id" : 242,
-      "name" : "minecraft:242",
+      "name" : "minecraft:barrier",
       "runtimeId" : 2114
    },
    {
@@ -13034,7 +13034,7 @@
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:256",
+      "name" : "minecraft:barrier",
       "runtimeId" : 2172
    },
    {
@@ -26978,7 +26978,7 @@
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:413",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4496
    },
    {
@@ -27092,577 +27092,577 @@
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:416",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4515
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:417",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4516
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:418",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4517
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:419",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4518
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:420",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4519
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:421",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4520
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:422",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4521
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:423",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4522
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:424",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4523
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:425",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4524
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:426",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4525
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:427",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4526
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:428",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4527
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:429",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4528
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:430",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4529
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:431",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4530
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:432",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4531
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:433",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4532
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:434",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4533
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:435",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4534
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:436",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4535
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:437",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4536
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:438",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4537
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:439",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4538
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:440",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4539
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:441",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4540
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:442",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4541
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:443",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4542
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:444",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4543
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:445",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4544
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:446",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4545
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:447",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4546
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:448",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4547
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:449",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4548
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:450",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4549
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:451",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4550
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:452",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4551
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:453",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4552
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:454",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4553
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:455",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4554
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:456",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4555
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:457",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4556
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:458",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4557
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:459",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4558
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:460",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4559
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:461",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4560
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:462",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4561
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:463",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4562
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:464",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4563
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:465",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4564
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:466",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4565
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:467",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4566
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:468",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4567
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:469",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4568
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:470",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4569
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:471",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4570
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:472",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4571
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:473",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4572
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:474",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4573
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:475",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4574
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:476",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4575
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:477",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4576
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:478",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4577
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:479",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4578
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:480",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4579
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:481",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4580
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:482",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4581
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:483",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4582
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:484",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4583
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:485",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4584
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:486",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4585
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:487",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4586
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:488",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4587
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:489",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4588
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:490",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4589
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:491",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4590
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:492",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4591
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:493",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4592
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:494",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4593
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:495",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4594
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:496",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4595
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:497",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4596
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:498",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4597
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:499",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4598
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:500",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4599
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:501",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4600
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:502",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4601
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:503",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4602
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:504",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4603
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:505",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4604
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:506",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4605
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:507",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4606
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:508",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4607
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:509",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4608
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:510",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4609
    },
    {
       "data" : 0,
       "id" : -1,
-      "name" : "minecraft:511",
+      "name" : "minecraft:barrier",
       "runtimeId" : 4610
    }
 ]
