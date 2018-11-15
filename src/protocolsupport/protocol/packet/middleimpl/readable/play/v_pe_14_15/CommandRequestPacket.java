@@ -37,14 +37,15 @@ public class CommandRequestPacket extends PEDefinedReadableMiddlePacket {
 	@Override
 	protected void read0(ByteBuf from) {
 		command = StringSerializer.readVarIntUTF8String(from);
-		// Command Origin Data
-		int type = VarNumberSerializer.readVarInt(from); // type
-		MiscSerializer.readUUIDLE(from); // UUID
-		MiscSerializer.nullVarArray(from); // request ID
-		if ((type == ORIGIN_DEV_CONSOLE) || (type == ORIGIN_TEST)) {
-			VarNumberSerializer.readSVarLong(from); // ???
-		}
-		from.readBoolean(); // isInternal
+//		// Command Origin Data
+//		int type = VarNumberSerializer.readVarInt(from); // type
+//		MiscSerializer.readUUIDLE(from); // UUID
+//		MiscSerializer.nullVarArray(from); // request ID
+//		if ((type == ORIGIN_DEV_CONSOLE) || (type == ORIGIN_TEST)) {
+//			VarNumberSerializer.readSVarLong(from); // ???
+//		}
+//		from.readBoolean(); // isInternal
+		from.skipBytes(from.readableBytes());
 	}
 
 	@Override
