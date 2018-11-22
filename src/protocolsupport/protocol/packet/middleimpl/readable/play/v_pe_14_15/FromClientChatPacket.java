@@ -10,6 +10,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Chat;
+import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.packet.middleimpl.readable.PEDefinedReadableMiddlePacket;
 import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.StringSerializer;
@@ -33,8 +34,10 @@ public class FromClientChatPacket extends PEDefinedReadableMiddlePacket {
 		Validate.isTrue(type == CLIENT_CHAT_TYPE, MessageFormat.format("Unexcepted serverbound chat type, expected {0}, but received {1}", CLIENT_CHAT_TYPE, type));
 		from.readBoolean(); //needs translation
 		MiscSerializer.nullVarArray(from); //skip sender
-		MiscSerializer.nullVarArray(from); //skip third party name
-		VarNumberSerializer.readSVarInt(from); //skip source platform
+		if (connection.getVersion().isBefore(ProtocolVersion.MINECRAFT_PE_1_7)) {
+            MiscSerializer.nullVarArray(from); //skip third party name
+            VarNumberSerializer.readSVarInt(from); //skip source platform
+        }
 		message = StringSerializer.readVarIntUTF8String(from);
 		MiscSerializer.nullVarArray(from); //skip Xbox user ID
 		MiscSerializer.nullVarArray(from); //skip platform chat ID

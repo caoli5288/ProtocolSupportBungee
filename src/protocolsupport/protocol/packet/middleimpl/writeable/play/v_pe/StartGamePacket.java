@@ -93,10 +93,13 @@ public class StartGamePacket extends WriteableMiddlePacket<Login> {
 		startgame.writeBoolean(false); // can Platformbroadcast
 		VarNumberSerializer.writeVarInt(startgame, 0); //Broadcast mode
 		startgame.writeBoolean(false); //Broadcast intent
-		if (version.isAfterOrEq(ProtocolVersion.MINECRAFT_PE_1_5)) {
+		if (!version.isBefore(ProtocolVersion.MINECRAFT_PE_1_5)) {
 			startgame.writeBoolean(false);
 			startgame.writeBoolean(false);
 			startgame.writeBoolean(false);
+			if (!version.isBefore(ProtocolVersion.MINECRAFT_PE_1_7)) {
+				startgame.writeBoolean(false);// use msa gamertags only
+			}
 		}
 		// END LEVEL SETTING
 		StringSerializer.writeVarIntUTF8String(startgame, levelId);
