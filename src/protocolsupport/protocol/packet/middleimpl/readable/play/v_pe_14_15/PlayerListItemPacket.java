@@ -82,7 +82,7 @@ public class PlayerListItemPacket extends PEDefinedReadableMiddlePacket {
             i.setUuid(el);
             return i;
         }).toArray(PlayerListItem.Item[]::new));
-        return Collections.singletonList(new PacketWrapper(item, Unpooled.EMPTY_BUFFER));
+        return Collections.singletonList(new PacketWrapper(item, Unpooled.wrappedBuffer(readbytes)));
     }
 
 }
