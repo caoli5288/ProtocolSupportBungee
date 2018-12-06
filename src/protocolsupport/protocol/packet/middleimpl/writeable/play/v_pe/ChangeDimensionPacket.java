@@ -1,6 +1,6 @@
 package protocolsupport.protocol.packet.middleimpl.writeable.play.v_pe;
 
-import gnu.trove.iterator.TLongIterator;
+import gnu.trove.set.hash.TLongHashSet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.UserConnection;
@@ -12,11 +12,11 @@ import protocolsupport.ProtocolSupport;
 import protocolsupport.api.Connection;
 import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.packet.middle.WriteableMiddlePacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerEntityRemovePacket;
 import protocolsupport.protocol.serializer.ArraySerializer;
 import protocolsupport.protocol.serializer.MiscSerializer;
 import protocolsupport.protocol.serializer.PEPacketIdSerializer;
 import protocolsupport.protocol.serializer.VarNumberSerializer;
-import protocolsupport.protocol.storage.LinkedTokenBasedThrottler;
 import protocolsupport.protocol.storage.NetworkDataCache;
 import protocolsupport.utils.netty.Allocator;
 
@@ -31,11 +31,14 @@ public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
     public Collection<ByteBuf> toData(Respawn packet) {
         if (cache.setAwaitDimensionAck(true, false)) {
             cache.setAwaitSpawn(true, false);
-            LinkedTokenBasedThrottler<Long> throttler = cache.getEntityKillThrottler();
-            TLongIterator iterator = cache.getWatchedEntities().iterator();
-            while (iterator.hasNext()) throttler.add(iterator.next());
-            cache.getWatchedEntities().clear();
-            return create(connection.getVersion(), cache, packet);
+            LinkedList<ByteBuf> packets = create(connection.getVersion(), cache, packet);
+            TLongHashSet entityIds = cache.getWatchedEntities();
+            entityIds.forEach(id -> {
+                packets.add(FromServerEntityRemovePacket.createEntityRemove(connection.getVersion(), id));
+                return true;
+            });
+            entityIds.clear();
+            return packets;
         }
         cache.getChangeDimensionQueue().add(packet);
         return Collections.emptyList();

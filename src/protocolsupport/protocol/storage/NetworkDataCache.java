@@ -84,12 +84,6 @@ public class NetworkDataCache {
 		return false;
 	}
 
-	private final LinkedTokenBasedThrottler<Long> entityKillThrottler = new LinkedTokenBasedThrottler<>(0x40);
-
-	public LinkedTokenBasedThrottler<Long> getEntityKillThrottler() {
-		return entityKillThrottler;
-	}
-
 	private ServerPostConnectedEvent postConnector;
 
 	public ServerPostConnectedEvent getPostConnector() {
