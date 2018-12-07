@@ -30,7 +30,6 @@ public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
     @Override
     public Collection<ByteBuf> toData(Respawn packet) {
         if (cache.setAwaitDimensionAck(true, false)) {
-            cache.setAwaitSpawn(true, false);
             LinkedList<ByteBuf> packets = create(connection.getVersion(), cache, packet);
             TLongHashSet entityIds = cache.getWatchedEntities();
             entityIds.forEach(id -> {
@@ -40,7 +39,7 @@ public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
             entityIds.clear();
             return packets;
         }
-        cache.getChangeDimensionQueue().add(packet);
+        cache.getSpawnQueue().add(packet);
         return Collections.emptyList();
     }
 
@@ -55,7 +54,7 @@ public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
     public static void onAckReceive(Connection connection, NetworkDataCache cache) {
         if (cache.isAwaitDimensionAck()) {
 //            System.out.println("onAckReceive");
-            LinkedList<Respawn> queue = cache.getChangeDimensionQueue();
+            LinkedList<Respawn> queue = cache.getSpawnQueue();
             if (queue.isEmpty()) {
                 cache.setAwaitDimensionAck(false, true);
                 ServerPostConnectedEvent event = cache.getPostConnector();
@@ -65,7 +64,7 @@ public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
                 Respawn packet = queue.remove();
                 LinkedList<ByteBuf> packets = create(connection.getVersion(), cache, packet);
                 UserConnection conn = (UserConnection) connection.getPlayer();
-                conn.sendPacket(new PacketWrapper(null, createPlayStatus(connection.getVersion(), 3)));
+//                conn.sendPacket(new PacketWrapper(null, createPlayStatus(connection.getVersion(), 3)));
                 for (ByteBuf buf : packets) {
                     conn.sendPacket(new PacketWrapper(null, buf));
                 }

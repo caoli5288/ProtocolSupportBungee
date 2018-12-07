@@ -94,26 +94,14 @@ public class NetworkDataCache {
 		this.postConnector = postConnector;
 	}
 
-	private final LinkedList<Respawn> changeDimensionQueue = new LinkedList<>();
+	private final LinkedList<Respawn> spawnQueue = new LinkedList<>();
 
-	public LinkedList<Respawn> getChangeDimensionQueue() {
-		return changeDimensionQueue;
+	public LinkedList<Respawn> getSpawnQueue() {
+		return spawnQueue;
 	}
 
 	public static NetworkDataCache getFrom(Connection connection) {
 		return (NetworkDataCache) connection.getMetadata(METADATA_KEY);
-	}
-
-	private boolean awaitSpawn;
-
-	public boolean isAwaitSpawn() {
-		return awaitSpawn;
-	}
-
-	public void setAwaitSpawn(boolean to, boolean from) {
-		if (awaitSpawn == from) {
-			awaitSpawn = to;
-		}
 	}
 
 }

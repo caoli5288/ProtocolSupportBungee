@@ -51,10 +51,6 @@ public class FromClientPlayerActionPacket extends PEDefinedReadableMiddlePacket 
         int action = VarNumberSerializer.readSVarInt(from);
 //        System.out.println("action id " + action);
         switch (action) {
-            case SPAWNED: {
-                cache.setAwaitSpawn(false, true);
-                break;
-            }
             case DIMENSION_CHANGE_ACK: {
                 ChangeDimensionPacket.onAckReceive(connection, cache);
                 break;
