@@ -11,6 +11,7 @@ import protocolsupport.api.ProtocolVersion;
 import protocolsupport.protocol.packet.middle.ReadableMiddlePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServBossEventPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerChatPacket;
+import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerItemEntityAddPacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerPluginMessagePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerEntityRemovePacket;
 import protocolsupport.protocol.packet.middleimpl.readable.play.v_pe_14_15.FromServerEntityAddPacket;
@@ -37,6 +38,7 @@ public class FromServerPacketDecoder extends MinecraftDecoder {
 		registry.register(Protocol.GAME, FromServerPluginMessagePacket.PACKET_ID, FromServerPluginMessagePacket.class);
 		registry.register(Protocol.GAME, FromServerEntityAddPacket.PACKET_ID, FromServerEntityAddPacket.class);
 		registry.register(Protocol.GAME, FromServerEntityRemovePacket.PACKET_ID, FromServerEntityRemovePacket.class);
+		registry.register(Protocol.GAME, FromServerItemEntityAddPacket.PACKET_ID, FromServerItemEntityAddPacket.class);
 	}
 
 	protected final Connection connection;
