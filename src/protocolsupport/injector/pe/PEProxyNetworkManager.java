@@ -34,6 +34,15 @@ public class PEProxyNetworkManager extends ChannelInboundHandlerAdapter {
 		if (serverconnection != null) {
 			serverconnection.close();
 		}
+		super.channelInactive(ctx);
+	}
+
+	@Override
+	public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+		if (serverconnection != null) {
+			serverconnection.close();
+		}
+		super.channelUnregistered(ctx);
 	}
 
 }

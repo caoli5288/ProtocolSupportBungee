@@ -114,23 +114,31 @@ public class ChangeDimensionPacket extends WriteableMiddlePacket<Respawn> {
         return serializer;
     }
 
+    public static final byte[] EMPTY_CHUNK_DATA = PRELOAD_EMPTY_CHUNK_DATA();
+
+    private static byte[] PRELOAD_EMPTY_CHUNK_DATA() {
+        ByteBuf buf = Unpooled.buffer();
+        buf.writeByte(1); //1st section
+        buf.writeByte(1); //New subchunk version!
+        buf.writeByte((1 << 1) | 1);  //Runtimeflag and palette id.
+        buf.writeZero(512);
+        VarNumberSerializer.writeSVarInt(buf, 1); //Palette size
+        VarNumberSerializer.writeSVarInt(buf, 0); //Air
+        buf.writeZero(512); //heightmap.
+        buf.writeZero(256); //Biomedata.
+        buf.writeByte(0); //borders
+        VarNumberSerializer.writeSVarInt(buf, 0); //extra data
+        byte[] data = MiscSerializer.readAllBytes(buf);
+        buf.release();
+        return data;
+    }
+
     private static ByteBuf createEmptyChunk(ProtocolVersion version, int x, int z) {
         ByteBuf serializer = Allocator.allocateBuffer();
         PEPacketIdSerializer.writePacketId(version, serializer, 58);
         VarNumberSerializer.writeSVarInt(serializer, x);
         VarNumberSerializer.writeSVarInt(serializer, z);
-        ByteBuf chunkdata = Unpooled.buffer();
-        chunkdata.writeByte(1); //1st section
-        chunkdata.writeByte(1); //New subchunk version!
-        chunkdata.writeByte((1 << 1) | 1);  //Runtimeflag and palette id.
-        chunkdata.writeZero(512);
-        VarNumberSerializer.writeSVarInt(chunkdata, 1); //Palette size
-        VarNumberSerializer.writeSVarInt(chunkdata, 0); //Air
-        chunkdata.writeZero(512); //heightmap.
-        chunkdata.writeZero(256); //Biomedata.
-        chunkdata.writeByte(0); //borders
-        VarNumberSerializer.writeSVarInt(chunkdata, 0); //extra data
-        ArraySerializer.writeVarIntLengthByteArray(serializer, chunkdata);
+        ArraySerializer.writeVarIntLengthByteArray(serializer, EMPTY_CHUNK_DATA);
         return serializer;
     }
 

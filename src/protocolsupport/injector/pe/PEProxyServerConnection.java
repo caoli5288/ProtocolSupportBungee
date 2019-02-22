@@ -48,6 +48,7 @@ public class PEProxyServerConnection extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		clientconnection.close();
+		super.channelInactive(ctx);
 	}
 
 	protected static final NioEventLoopGroup group = new NioEventLoopGroup();

@@ -23,4 +23,9 @@ public class ArraySerializer {
 		to.writeBytes(array);
 	}
 
+	public static void writeVarIntLengthByteArray(ByteBuf to, byte[] array) {
+		VarNumberSerializer.writeVarInt(to, array.length);
+		to.writeBytes(array);
+	}
+
 }
